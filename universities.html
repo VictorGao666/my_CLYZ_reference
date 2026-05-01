@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中国各高校索引 — 中国高等教育信息平台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <!-- 导航栏（与主页相同） -->
+  <nav class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <a href="index.html" class="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
+          中国高等教育信息平台
+        </a>
+        <div class="hidden md:flex items-center space-x-1">
+          <a href="index.html" class="nav-link px-4 py-2 text-gray-700 hover:text-blue-600 rounded-lg transition-colors">首页</a>
+          <a href="universities.html" class="nav-link px-4 py-2 text-gray-700 hover:text-blue-600 rounded-lg transition-colors">高校索引</a>
+          <a href="majors.html" class="nav-link px-4 py-2 text-gray-700 hover:text-blue-600 rounded-lg transition-colors">专业索引</a>
+        </div>
+        <button onclick="toggleMenu()" class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+      <div id="mobile-menu" class="hidden md:hidden pb-4">
+        <a href="index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">首页</a>
+        <a href="universities.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">高校索引</a>
+        <a href="majors.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">专业索引</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-1">
+    <!-- 页面标题 -->
+    <section class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 class="text-3xl md:text-4xl font-bold">中国各高校索引</h1>
+        <p class="mt-3 text-blue-100 text-lg">39所"985工程"重点建设高校</p>
+      </div>
+    </section>
+
+    <!-- 搜索和内容区域 -->
+    <section class="py-10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 搜索栏 -->
+        <div class="mb-8">
+          <div class="relative max-w-md">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input
+              id="university-search"
+              type="text"
+              placeholder="搜索高校名称、省份或城市..."
+              class="search-input w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-400 transition-colors"
+            >
+          </div>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="flex items-center gap-4 mb-6 text-sm text-gray-500">
+          <span class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">985一期 9所</span>
+          <span class="inline-flex items-center px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-medium">985二期 30所</span>
+          <span>共 <strong class="text-gray-700">39</strong> 所</span>
+        </div>
+
+        <!-- 高校网格 -->
+        <div id="universities-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <!-- JS 动态渲染 -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-gray-900 text-gray-400 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
+      <p>中国高等教育信息平台 &copy; 2026 — 数据仅供参考，以教育部官方公布为准</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

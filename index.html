@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中国高等教育信息平台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <!-- 导航栏 -->
+  <nav class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <a href="index.html" class="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
+          中国高等教育信息平台
+        </a>
+        <!-- 桌面导航 -->
+        <div class="hidden md:flex items-center space-x-1">
+          <a href="index.html" class="nav-link px-4 py-2 text-gray-700 hover:text-blue-600 rounded-lg transition-colors">首页</a>
+          <a href="universities.html" class="nav-link px-4 py-2 text-gray-700 hover:text-blue-600 rounded-lg transition-colors">高校索引</a>
+          <a href="majors.html" class="nav-link px-4 py-2 text-gray-700 hover:text-blue-600 rounded-lg transition-colors">专业索引</a>
+        </div>
+        <!-- 移动端菜单按钮 -->
+        <button onclick="toggleMenu()" class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+      <!-- 移动端菜单 -->
+      <div id="mobile-menu" class="hidden md:hidden pb-4">
+        <a href="index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">首页</a>
+        <a href="universities.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">高校索引</a>
+        <a href="majors.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">专业索引</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-1">
+    <!-- Hero 区域 -->
+    <section class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+        <div class="max-w-3xl">
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+            探索中国高等教育
+          </h1>
+          <p class="text-lg md:text-xl text-blue-100 mb-8 leading-relaxed">
+            一站式了解中国顶尖高校与本科专业，为您的学业规划提供全面参考。
+            涵盖39所985工程大学及12大学科门类的数百个本科专业。
+          </p>
+          <div class="flex flex-wrap gap-4">
+            <a href="universities.html" class="inline-flex items-center px-6 py-3 bg-white text-blue-700 font-semibold rounded-lg hover:bg-blue-50 transition-colors shadow-lg">
+              浏览高校
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </a>
+            <a href="majors.html" class="inline-flex items-center px-6 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white/10 transition-colors">
+              浏览专业
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 前言 / 介绍 -->
+    <section class="py-16 md:py-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl mx-auto text-center">
+          <h2 class="text-3xl font-bold text-gray-900 mb-6">关于本平台</h2>
+          <div class="prose prose-lg text-gray-600 space-y-4">
+            <p class="leading-relaxed">
+              中国拥有世界上规模最大的高等教育体系，截至2024年，全国共有普通高等学校2800余所，
+              本科专业涵盖哲学、经济学、法学、教育学、文学、历史学、理学、工学、农学、医学、管理学、艺术学12大学科门类。
+            </p>
+            <p class="leading-relaxed">
+              本平台汇集了代表中国高等教育顶尖水平的"985工程"39所高校的详细信息，
+              以及教育部颁布的本科专业目录中的各学科专业，旨在为高考考生、在校学生及教育工作者提供一个便捷的参考工具。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 功能卡片 -->
+    <section class="pb-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-2 gap-8">
+          <!-- 高校索引卡片 -->
+          <a href="universities.html" class="group block bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-blue-200 hover-lift">
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6">
+              <div class="flex items-center justify-between">
+                <h3 class="text-2xl font-bold text-white">中国各高校索引</h3>
+                <span class="text-4xl">🏫</span>
+              </div>
+            </div>
+            <div class="p-6">
+              <p class="text-gray-600 leading-relaxed mb-4">
+                收录中国39所"985工程"重点建设高校，包含学校所在地、所属省份等基本信息。
+                支持按校名、省份、城市快速搜索。
+              </p>
+              <div class="flex items-center text-blue-600 font-medium group-hover:gap-2 transition-all">
+                查看全部高校
+                <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </div>
+            </div>
+          </a>
+          <!-- 专业索引卡片 -->
+          <a href="majors.html" class="group block bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-green-200 hover-lift">
+            <div class="bg-gradient-to-r from-emerald-500 to-teal-600 p-6">
+              <div class="flex items-center justify-between">
+                <h3 class="text-2xl font-bold text-white">各专业索引</h3>
+                <span class="text-4xl">📚</span>
+              </div>
+            </div>
+            <div class="p-6">
+              <p class="text-gray-600 leading-relaxed mb-4">
+                按12大学科门类系统整理中国大学本科专业，涵盖哲学、经济学、法学、教育学、
+                文学、历史学、理学、工学、农学、医学、管理学、艺术学等全部门类。
+              </p>
+              <div class="flex items-center text-emerald-600 font-medium group-hover:gap-2 transition-all">
+                查看全部专业
+                <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 数据统计 -->
+    <section class="py-16 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div class="p-6">
+            <div class="text-3xl md:text-4xl font-bold text-blue-600">39</div>
+            <div class="text-sm text-gray-500 mt-2">985工程高校</div>
+          </div>
+          <div class="p-6">
+            <div class="text-3xl md:text-4xl font-bold text-emerald-600">12</div>
+            <div class="text-sm text-gray-500 mt-2">学科门类</div>
+          </div>
+          <div class="p-6">
+            <div class="text-3xl md:text-4xl font-bold text-purple-600">700+</div>
+            <div class="text-sm text-gray-500 mt-2">本科专业</div>
+          </div>
+          <div class="p-6">
+            <div class="text-3xl md:text-4xl font-bold text-amber-600">2800+</div>
+            <div class="text-sm text-gray-500 mt-2">全国高校总数</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-gray-900 text-gray-400 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
+      <p>中国高等教育信息平台 &copy; 2026 — 数据仅供参考，以教育部官方公布为准</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
