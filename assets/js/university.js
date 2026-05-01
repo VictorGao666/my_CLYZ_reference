@@ -43,6 +43,27 @@ function getCustomScore(uniId, c) {
   return val ? parseInt(val, 10) : null;
 }
 
+// ========== 自定义学院数据（localStorage）==========
+
+function getSchoolsKey(uniId) {
+  return 'uni_schools_' + uniId;
+}
+
+function getCustomSchools(uniId) {
+  try {
+    const saved = localStorage.getItem(getSchoolsKey(uniId));
+    return saved ? JSON.parse(saved) : null;
+  } catch(e) { return null; }
+}
+
+function saveCustomSchools(uniId, schools) {
+  localStorage.setItem(getSchoolsKey(uniId), JSON.stringify(schools));
+}
+
+function getSchoolsData(uni) {
+  return getCustomSchools(uni.id) || JSON.parse(JSON.stringify(uni.schools));
+}
+
 // ========== 渲染详情页 ==========
 
 function renderUniversityDetail() {
@@ -88,34 +109,43 @@ function renderUniversityDetail() {
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
         <div><span class="text-gray-500">所在地：</span><span class="text-gray-900 font-medium">${uni.province} · ${uni.city}</span></div>
         <div><span class="text-gray-500">批次：</span><span class="text-gray-900 font-medium">985工程${uni.batch}</span></div>
-        <div><span class="text-gray-500">学院数：</span><span class="text-gray-900 font-medium">${uni.schools.length} 个</span></div>
+        <div><span class="text-gray-500">学院数：</span><span class="text-gray-900 font-medium" id="schools-count">${getSchoolsData(uni).length} 个</span></div>
         <div><span class="text-gray-500">定位：</span><span class="text-gray-900 font-medium">${uni.intro}</span></div>
       </div>
     </div>`;
 
+  const schoolsData = getSchoolsData(uni);
+  const hasCustom = !!getCustomSchools(uni.id);
+
   html += `<h2 class="text-xl font-bold text-gray-900 mb-4">各学院及本科专业</h2>`;
-  html += `<div class="flex gap-2 mb-4">
+  html += `<div class="flex gap-2 mb-4 flex-wrap">
     <button onclick="toggleAllSchools(true)" class="px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm font-medium transition-colors">展开全部学院</button>
     <button onclick="toggleAllSchools(false)" class="px-3 py-1.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm font-medium transition-colors">折叠全部学院</button>
+    <button onclick="addSchool(${uni.id})" class="px-3 py-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 text-sm font-medium transition-colors">+ 添加学院</button>
+    <button onclick="resetSchoolsData(${uni.id})" class="px-3 py-1.5 text-gray-400 hover:text-red-500 text-sm underline transition-colors ${hasCustom ? '' : 'hidden'}" id="reset-schools-btn">恢复默认学院数据</button>
   </div>`;
 
   html += `<div class="space-y-3 mb-10" id="schools-container">`;
 
-  uni.schools.forEach((school, si) => {
+  schoolsData.forEach((school, si) => {
     html += `
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <button onclick="toggleSchool(this)" class="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
-          <div class="flex items-center gap-3">
-            <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">${si + 1}</span>
-            <span class="text-lg font-bold text-gray-900 text-left">${school.name}</span>
-            <span class="text-xs text-gray-400">${school.disciplines.length} 个学科</span>
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden school-item" data-school-index="${si}">
+        <div class="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+          <button onclick="toggleSchool(this)" class="flex items-center gap-3 flex-1 text-left min-w-0">
+            <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold flex-shrink-0">${si + 1}</span>
+            <span class="text-lg font-bold text-gray-900 school-name-text truncate" contenteditable="true" data-school-idx="${si}" onblur="renameSchool(event, ${uni.id})">${school.name}</span>
+            <span class="text-xs text-gray-400 flex-shrink-0">${school.disciplines.length} 个学科</span>
+          </button>
+          <div class="flex items-center gap-1 ml-2 flex-shrink-0">
+            <button onclick="event.stopPropagation(); deleteSchool(${si}, ${uni.id})" title="删除学院" class="text-gray-300 hover:text-red-500 transition-colors p-1 rounded hover:bg-red-50">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
           </div>
-          <svg class="w-5 h-5 school-arrow transition-transform duration-300 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-        </button>
+        </div>
         <div class="school-body hidden">
           <div class="px-4 pb-4 space-y-3">`;
 
-    school.disciplines.forEach(d => {
+    school.disciplines.forEach((d, di) => {
       html += `
             <div class="border border-gray-100 rounded-lg p-3">
               <div class="flex items-center justify-between mb-2">
@@ -125,10 +155,14 @@ function renderUniversityDetail() {
                   <span class="text-xs text-gray-400 ml-1">五轮</span>${assessmentBadge(d.assessment5)}
                 </div>
               </div>
-              <div class="flex flex-wrap gap-1.5">
-                ${d.majors.length > 0 ? d.majors.map(m => `
-                  <span class="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-medium">${m}</span>
+              <div class="flex flex-wrap gap-1.5 items-center">
+                ${d.majors.length > 0 ? d.majors.map((m, mi) => `
+                  <span class="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-medium inline-flex items-center gap-1 group">
+                    ${m}
+                    <button onclick="deleteMajor(${si}, ${di}, ${mi}, ${uni.id})" title="删除专业" class="text-gray-300 hover:text-red-500 transition-colors leading-none">&times;</button>
+                  </span>
                 `).join('') : '<span class="text-xs text-gray-400">该学科暂无本科专业列出</span>'}
+                <button onclick="addMajor(${si}, ${di}, ${uni.id})" title="添加专业" class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-50 text-emerald-500 hover:bg-emerald-100 hover:text-emerald-600 transition-colors text-xs font-bold leading-none">+</button>
               </div>
             </div>`;
     });
@@ -138,6 +172,10 @@ function renderUniversityDetail() {
         </div>
       </div>`;
   });
+
+  if (schoolsData.length === 0) {
+    html += `<div class="text-center py-8 text-gray-400">暂无学院数据，点击上方"＋ 添加学院"按钮添加。</div>`;
+  }
 
   html += `</div>`;
 
@@ -281,7 +319,8 @@ function renderUniversityDetail() {
 // ========== 学院折叠 ==========
 
 function toggleSchool(btn) {
-  const body = btn.parentElement.querySelector('.school-body');
+  const item = btn.closest('.school-item');
+  const body = item.querySelector('.school-body');
   const arrow = btn.querySelector('.school-arrow');
   body.classList.toggle('hidden');
   arrow.classList.toggle('rotate-180');
@@ -289,14 +328,106 @@ function toggleSchool(btn) {
 
 function toggleAllSchools(expand) {
   document.querySelectorAll('.school-body').forEach(body => {
+    const item = body.closest('.school-item');
+    const arrow = item?.querySelector('.school-arrow');
     if (expand) {
       body.classList.remove('hidden');
-      body.parentElement.querySelector('.school-arrow')?.classList.add('rotate-180');
+      arrow?.classList.add('rotate-180');
     } else {
       body.classList.add('hidden');
-      body.parentElement.querySelector('.school-arrow')?.classList.remove('rotate-180');
+      arrow?.classList.remove('rotate-180');
     }
   });
+}
+
+// ========== 学院编辑（增删改）==========
+
+function updateSchoolsCount() {
+  const countEl = document.getElementById('schools-count');
+  if (countEl) {
+    const schools = document.querySelectorAll('.school-item');
+    countEl.textContent = schools.length + ' 个';
+  }
+}
+
+function addSchool(uniId) {
+  const name = prompt('请输入新学院名称：', '');
+  if (!name || !name.trim()) return;
+  const schools = getCustomSchools(uniId) || getSchoolsData({ id: uniId, schools: getSchoolsData(getUniversity()) });
+  schools.push({
+    name: name.trim(),
+    disciplines: [{ name: '未命名学科', assessment4: '', assessment5: '', majors: [] }]
+  });
+  saveCustomSchools(uniId, schools);
+  renderUniversityDetail();
+}
+
+function deleteSchool(si, uniId) {
+  const schools = getCustomSchools(uniId) || getSchoolsData({ id: uniId, schools: getSchoolsData(getUniversity()) });
+  const school = schools[si];
+  if (!school) return;
+  if (!confirm(`确定要删除学院"${school.name}"及其所有学科和专业吗？此操作不可恢复。`)) return;
+  schools.splice(si, 1);
+  if (schools.length > 0) {
+    saveCustomSchools(uniId, schools);
+  } else {
+    localStorage.removeItem(getSchoolsKey(uniId));
+  }
+  renderUniversityDetail();
+}
+
+function renameSchool(event, uniId) {
+  const el = event.target;
+  const newName = el.textContent.trim();
+  const si = parseInt(el.getAttribute('data-school-idx'), 10);
+  const uni = getUniversity();
+  const schools = getCustomSchools(uniId) || JSON.parse(JSON.stringify(uni.schools));
+  if (!newName) {
+    el.textContent = schools[si]?.name || '未命名学院';
+    return;
+  }
+  if (schools[si]) {
+    schools[si].name = newName;
+    saveCustomSchools(uniId, schools);
+    updateSchoolsCount();
+    updateResetButton(uniId);
+  }
+}
+
+function addMajor(si, di, uniId) {
+  const majorName = prompt('请输入新专业名称：', '');
+  if (!majorName || !majorName.trim()) return;
+  const schools = getCustomSchools(uniId) || getSchoolsData({ id: uniId, schools: getSchoolsData(getUniversity()) });
+  if (!schools[si] || !schools[si].disciplines[di]) return;
+  schools[si].disciplines[di].majors.push(majorName.trim());
+  saveCustomSchools(uniId, schools);
+  renderUniversityDetail();
+}
+
+function deleteMajor(si, di, mi, uniId) {
+  const schools = getCustomSchools(uniId) || getSchoolsData({ id: uniId, schools: getSchoolsData(getUniversity()) });
+  const major = schools[si]?.disciplines[di]?.majors[mi];
+  if (!major) return;
+  if (!confirm(`确定要删除专业"${major}"吗？`)) return;
+  schools[si].disciplines[di].majors.splice(mi, 1);
+  saveCustomSchools(uniId, schools);
+  renderUniversityDetail();
+}
+
+function resetSchoolsData(uniId) {
+  if (!confirm('确定要恢复为默认学院数据吗？所有自定义修改（学院名称、增删学院、增删专业）将丢失。此操作不可恢复。')) return;
+  localStorage.removeItem(getSchoolsKey(uniId));
+  renderUniversityDetail();
+}
+
+function updateResetButton(uniId) {
+  const btn = document.getElementById('reset-schools-btn');
+  if (!btn) return;
+  if (getCustomSchools(uniId)) {
+    btn.classList.remove('hidden');
+  } else {
+    btn.classList.add('hidden');
+  }
 }
 
 // ========== 行排序 ==========
