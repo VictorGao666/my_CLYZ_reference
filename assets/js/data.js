@@ -670,21 +670,31 @@ const universities = [
       year: '2025',
       province: '河北',
       categories: [
-        { name: '电子信息类（计算机永强试验班）', type: '大类', subject: '物理类', quota: 2, score: 688, includes: '含双学士学位项目' },
+        // === 物理类 本科批 ===
+        { name: '电子信息类（计算机永强试验班）', type: '大类', subject: '物理类', quota: 2, score: 688, includes: '含计算机科学与技术、软件工程、信息安全' },
         { name: '人工智能（拔尖英才试点班）', type: '专业', subject: '物理类', quota: 3, score: 687, includes: '7000元/年' },
-        { name: '工科试验班类（信息类）', type: '大类', subject: '物理类', quota: 16, score: 680, includes: '计算机科学与技术、信息安全、软件工程、微电子、信息工程、电子科学与技术、自动化、电气工程等' },
         { name: '电子信息类（IEEE试点班）', type: '大类', subject: '物理类', quota: 3, score: 686, includes: '计算机科学与技术、信息工程、信息安全、自动化；含双学士学位' },
         { name: '电子信息类（集成电路英才班）', type: '大类', subject: '物理类', quota: 2, score: 686, includes: '微电子科学与工程、电子科学与技术、信息工程' },
+        { name: '机械类（钱学森工程科学试点班）', type: '大类', subject: '物理类', quota: 1, score: 682, includes: '机械工程、能源与动力工程；含双学士学位项目' },
         { name: '理科试验班类（数学方向）', type: '大类', subject: '物理类', quota: 2, score: 680, includes: '数学与应用数学、统计学；含数学-人工智能双学士学位' },
+        { name: '工科试验班类（信息类）', type: '大类', subject: '物理类', quota: 16, score: 680, includes: '计算机科学与技术、信息安全、软件工程、微电子、信息工程、电子科学与技术、自动化、电气工程等' },
         { name: '电子信息类（浦江国际学院）', type: '大类', subject: '物理类', quota: 4, score: 669, includes: '中外合作办学，机械工程、电子与计算机工程；75000元/年' },
-        { name: '法学试验班', type: '大类', subject: '历史类', quota: 2, score: 667, includes: '含法学-经济学双学士学位，历史类' },
-        { name: '人文科学试验班（国务学院）', type: '大类', subject: '历史类', quota: 2, score: 663, includes: '行政管理；含行政管理-法学双学士学位，历史类' },
-        { name: '人文科学试验班（人文学院）', type: '大类', subject: '历史类', quota: 2, score: 660, includes: '汉语言文学（中外文化交流），历史类' },
-        { name: '人文科学试验班（媒传学院）', type: '大类', subject: '历史类', quota: 2, score: 660, includes: '传播学，历史类' },
-        { name: '医学试验班（临床方向）', type: '大类', subject: '物理类', quota: 19, score: 660, includes: '临床医学五年制，含国际交流项目，7400元/年·5年' },
-        { name: '临床医学（八年制本博连读）', type: '专业', subject: '物理类', quota: 3, score: 675, includes: '7400元/年·8年' },
-        { name: '口腔医学（5+3一体化）', type: '专业', subject: '物理类', quota: 4, score: 663, includes: '7400元/年·5年' },
-        { name: '工科试验班类（国家专项）', type: '大类', subject: '物理类', quota: 12, score: 661, includes: '提前批B段，物理类' }
+        // === 物理类 提前批B段（国家专项）===
+        { name: '工科试验班类（国家专项）', type: '大类', subject: '物理类', quota: 1, score: 678, includes: '提前批B段，溥渊未来技术学院，健康方向' },
+        { name: '经济管理试验班（国家专项）', type: '大类', subject: '物理类', quota: 1, score: 674, includes: '提前批B段，含双学士学位项目' },
+        { name: '工科试验班类（国家专项）', type: '大类', subject: '物理类', quota: 10, score: 668, includes: '提前批B段，物理类' },
+        // === 历史类 本科批 ===
+        { name: '法学试验班', type: '大类', subject: '历史类', quota: 2, score: 667, includes: '含法学-经济学双学士学位' },
+        { name: '人文科学试验班（国务学院）', type: '大类', subject: '历史类', quota: 2, score: 663, includes: '行政管理；含行政管理-法学双学士学位' },
+        { name: '人文科学试验班（人文学院）', type: '大类', subject: '历史类', quota: 2, score: 660, includes: '汉语言文学（中外文化交流）' },
+        { name: '人文科学试验班（媒传学院）', type: '大类', subject: '历史类', quota: 2, score: 660, includes: '传播学' },
+        // === 医学院 物理类 本科批 ===
+        { name: '临床医学（八年制本博连读）', type: '专业', subject: '物理类', quota: 3, score: 681, includes: '医学院，含国际交流项目，7400元/年·8年' },
+        { name: '口腔医学（5+3一体化）', type: '专业', subject: '物理类', quota: 4, score: 674, includes: '医学院，含国际交流项目，7400元/年·5年' },
+        { name: '医学试验班（临床方向）', type: '大类', subject: '物理类', quota: 19, score: 662, includes: '医学院，临床医学五年制，含国际交流项目，7400元/年·5年' },
+        // === 医学院 提前批B段（国家专项）===
+        { name: '医学试验班（国家专项）', type: '大类', subject: '物理类', quota: 4, score: 662, includes: '医学院，提前批B段，临床方向' },
+        { name: '医学试验班（国家专项）', type: '大类', subject: '物理类', quota: 7, score: 638, includes: '医学院，提前批B段，预防方向' }
       ]
     }
   },
