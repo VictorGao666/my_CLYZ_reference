@@ -898,10 +898,10 @@ const universities = [
       province: '河北',
       categories: [
         // === 历史类 本科批 ===
-        { name: '社会科学试验班（竺可桢学院人文社科实验班）', type: '大类', subject: '历史类', quota: 3, score: 665, includes: '杭州市，含经济学、财政学、金融学、法学等专业' },
-        { name: '社会科学试验班（含数字金融双学士学位项目）', type: '大类', subject: '历史类', quota: 15, score: 659, includes: '杭州市，含数字金融（金融学-数学与应用数学）双学士学位项目' },
-        { name: '人文科学试验班', type: '大类', subject: '历史类', quota: 4, score: 658, includes: '杭州市，含古典文献学、汉语言文学、哲学、历史学等专业' },
-        { name: '外国语言文学类（含涉外法治双学士学位项目）', type: '大类', subject: '历史类', quota: 4, score: 657, includes: '杭州市，含英语、翻译专业' },
+        { name: '社会科学试验班（竺可桢学院人文社科实验班）', type: '大类', subject: '历史类', quota: 3, score: 665, includes: '杭州市，含经济学、财政学、金融学、国际经济与贸易、教育学、会计学、工商管理、社会学、农林经济管理、行政管理、劳动与社会保障、土地资源管理、法学专业' },
+        { name: '社会科学试验班（含数字金融双学士学位项目）', type: '大类', subject: '历史类', quota: 15, score: 659, includes: '杭州市，含经济学、财政学、金融学、国际经济与贸易、教育学、会计学、工商管理、社会学、农林经济管理、行政管理、劳动与社会保障、土地资源管理、法学专业；含数字金融（金融学-数学与应用数学）双学士学位项目' },
+        { name: '人文科学试验班', type: '大类', subject: '历史类', quota: 4, score: 658, includes: '杭州市，含古典文献学、汉语言文学、哲学、历史学、文物与博物馆学、考古学专业' },
+        { name: '外国语言文学类（含涉外法治双学士学位项目）', type: '大类', subject: '历史类', quota: 4, score: 657, includes: '杭州市，含英语、翻译专业；含涉外法治（英语-法学）双学士学位项目' },
         // === 历史类 提前批B段（国家专项）===
         { name: '社会科学试验班（国家专项计划）', type: '大类', subject: '历史类', quota: 2, score: 658, includes: '杭州市，提前批B段，含数字金融双学士学位项目' },
         { name: '人文科学试验班（国家专项计划）', type: '大类', subject: '历史类', quota: 2, score: 655, includes: '杭州市，提前批B段' },
@@ -909,9 +909,9 @@ const universities = [
         // === 物理类 本科批 ===
         { name: '工科试验班（竺可桢学院图灵班）', type: '大类', subject: '物理类', quota: 4, score: 684, includes: '杭州市，含计算机科学与技术专业' },
         { name: '人工智能', type: '专业', subject: '物理类', quota: 6, score: 682, includes: '杭州市' },
-        { name: '工科试验班（EE类）', type: '大类', subject: '物理类', quota: 5, score: 680, includes: '杭州市，含电气工程及其自动化、电子信息工程等专业' },
+        { name: '工科试验班（EE类）', type: '大类', subject: '物理类', quota: 5, score: 680, includes: '杭州市，含电气工程及其自动化（爱迪生班）、电子信息工程（爱迪生班）、电子科学与技术（香农班）、信息工程（香农班）专业' },
         { name: '工科试验班（智能制造与机器人创新班）', type: '大类', subject: '物理类', quota: 3, score: 680, includes: '杭州市，含机械工程专业' },
-        { name: '工科试验班（信息）', type: '大类', subject: '物理类', quota: 16, score: 679, includes: '杭州市，含计算机科学与技术、信息安全、软件工程等专业' },
+        { name: '工科试验班（信息）', type: '大类', subject: '物理类', quota: 16, score: 679, includes: '杭州市，含计算机科学与技术、信息安全、软件工程、工业设计、光电信息科学与工程、电子科学与技术、微电子科学与工程、信息工程、自动化、生物医学工程专业' },
         // === 物理类 提前批B段（国家专项）===
         { name: '工科试验班（国家专项计划，信息）', type: '大类', subject: '物理类', quota: 2, score: 677, includes: '杭州市，提前批B段' },
         { name: '工科试验班（国家专项计划）', type: '大类', subject: '物理类', quota: 2, score: 672, includes: '杭州市，提前批B段' },
@@ -919,7 +919,7 @@ const universities = [
         { name: '工科试验班（国家专项计划，智慧城市与建筑工程）', type: '大类', subject: '物理类', quota: 2, score: 665, includes: '杭州市，提前批B段' },
         { name: '工科试验班（国家专项计划，海洋）', type: '大类', subject: '物理类', quota: 2, score: 654, includes: '杭州市，提前批B段，含智慧海洋卓越班' },
         // === 物理类 中外合作办学 ===
-        { name: '工科试验班（ZJUUIUC联合学院）', type: '大类', subject: '物理类', quota: 15, score: 650, includes: '中外合作办学，海宁国际校区，含机械工程、电子与计算机工程等专业' }
+        { name: '工科试验班（ZJUUIUC联合学院）', type: '大类', subject: '物理类', quota: 15, score: 650, includes: '中外合作办学，海宁国际校区，含机械工程、电子与计算机工程、电气工程及其自动化、土木工程专业；同时获浙江大学毕业证书、学士学位证书和美国伊利诺伊大学厄巴纳香槟校区学士学位证书' }
       ]
     }
   },
@@ -1056,23 +1056,23 @@ const universities = [
       province: '河北',
       categories: [
         // === 历史类 本科批 ===
-        { name: '人文科学试验班', type: '大类', subject: '历史类', quota: 4, score: 660, includes: '含汉语言文学、哲学、新闻学、历史学、考古学等专业' },
-        { name: '经济管理试验班（数智经济与管理）', type: '大类', subject: '历史类', quota: 6, score: 659, includes: '含经济学、金融学、保险学、工商管理类、国际经济与贸易、财政学专业' },
-        { name: '社会科学试验班', type: '大类', subject: '历史类', quota: 3, score: 659, includes: '含法学、社会学类、公共管理类、图书馆学、档案学等专业' },
+        { name: '人文科学试验班', type: '大类', subject: '历史类', quota: 4, score: 660, includes: '含汉语言文学、哲学、汉语国际教育、新闻学、广播电视学、广告学、历史学、考古学、考古学（文物鉴定方向）专业' },
+        { name: '经济管理试验班（数智经济与管理）', type: '大类', subject: '历史类', quota: 6, score: 659, includes: '含经济学、金融学、保险学、经济学（产业经济学方向）、工商管理类、国际经济与贸易、财政学专业' },
+        { name: '社会科学试验班', type: '大类', subject: '历史类', quota: 3, score: 659, includes: '含法学、社会学类、公共管理类、图书馆学、档案学、编辑出版学专业；专业分流方向详见我校招生章程' },
         // === 历史类 提前批B段（国家专项）===
         { name: '社会科学试验班（国家专项计划）', type: '大类', subject: '历史类', quota: 2, score: 651, includes: '提前批B段' },
         { name: '经济管理试验班（国家专项计划，数智经济与管理）', type: '大类', subject: '历史类', quota: 2, score: 649, includes: '提前批B段' },
         { name: '人文科学试验班（国家专项计划）', type: '大类', subject: '历史类', quota: 2, score: 649, includes: '提前批B段' },
         // === 物理类 本科批 ===
         { name: '人工智能', type: '专业', subject: '物理类', quota: 3, score: 682, includes: '' },
-        { name: '理科试验班（匡亚明学院大理科班）', type: '大类', subject: '物理类', quota: 3, score: 679, includes: '含数学与应用数学、信息与计算科学、物理学、化学、计算机科学与技术等专业' },
+        { name: '理科试验班（匡亚明学院大理科班）', type: '大类', subject: '物理类', quota: 3, score: 679, includes: '含数学与应用数学、信息与计算科学、物理学、化学、天文学、生物科学、生物科学（生物化学与分子生物学方向）、计算机科学与技术、计算机科学与技术（脑科学与AI方向）专业' },
         { name: '计算机科学与技术', type: '专业', subject: '物理类', quota: 5, score: 678, includes: '' },
         { name: '软件工程', type: '专业', subject: '物理类', quota: 4, score: 677, includes: '' },
         { name: '电子信息类', type: '大类', subject: '物理类', quota: 6, score: 677, includes: '含电子信息科学与技术、通信工程、微电子科学与工程、集成电路设计与集成系统专业' },
         { name: '计算机科学与技术（计算机金融实验班）', type: '专业', subject: '物理类', quota: 3, score: 676, includes: '含双学士学位' },
         { name: '软件工程（软工经济创新班）', type: '专业', subject: '物理类', quota: 3, score: 675, includes: '含双学士学位' },
-        { name: '理科试验班类（数理科学类）', type: '大类', subject: '物理类', quota: 5, score: 675, includes: '含数学与应用数学、信息与计算科学、统计学、物理学、天文学、大气科学等专业' },
-        { name: '工科试验班', type: '大类', subject: '物理类', quota: 3, score: 675, includes: '含光电信息科学与工程、生物医学工程、材料物理、材料化学、新能源科学与工程专业' },
+        { name: '理科试验班类（数理科学类）', type: '大类', subject: '物理类', quota: 5, score: 675, includes: '含数学与应用数学、信息与计算科学、统计学、物理学、应用物理学、声学、天文学、大气科学、应用气象学专业' },
+        { name: '工科试验班', type: '大类', subject: '物理类', quota: 3, score: 675, includes: '含光电信息科学与工程、生物医学工程、工业工程类、材料物理、材料化学、新能源科学与工程专业' },
         { name: '技术科学试验班', type: '大类', subject: '物理类', quota: 9, score: 675, includes: '含智能科学与技术、集成电路设计与集成系统、数字经济、自动化（机器人方向）专业' },
         { name: '理科试验班类（化学与生命科学类）', type: '大类', subject: '物理类', quota: 4, score: 674, includes: '含生物科学、生物技术、生态学、化学、应用化学专业' },
         // === 物理类 提前批B段（国家专项）===
@@ -1168,9 +1168,9 @@ const universities = [
       province: '河北',
       categories: [
         // === 物理类 本科批 ===
-        { name: '工科试验班（信息智能方向）', type: '大类', subject: '物理类', quota: 11, score: 677, includes: '合肥市，含计算机类、电子信息类、人工智能、集成电路设计与集成系统、网络空间安全专业' },
-        { name: '工科试验班（航空航天、人形机器人、低碳能源技术及安全）', type: '大类', subject: '物理类', quota: 3, score: 676, includes: '合肥市，含机器人工程、理论与应用力学、机械设计制造及其自动化、能源与动力工程、安全工程专业' },
-        { name: '理科试验班类', type: '大类', subject: '物理类', quota: 17, score: 675, includes: '合肥市，含量子信息科学、数学类、物理学类、化学类、生物科学类、空间科学与技术、统计学等专业' },
+        { name: '工科试验班（信息智能方向）', type: '大类', subject: '物理类', quota: 11, score: 677, includes: '合肥市，含计算机类、计算机类（华夏计算机科技英才班）、电子信息类、电子信息类（信息科技英才班）、人工智能、集成电路设计与集成系统、网络空间安全专业' },
+        { name: '工科试验班（航空航天、人形机器人、低碳能源技术及安全）', type: '大类', subject: '物理类', quota: 3, score: 676, includes: '合肥市，含机器人工程、理论与应用力学、机械设计制造及其自动化、测控技术与仪器、能源与动力工程、安全工程专业；教育部基础学科拔尖学生培养基地。含钱学森力学科技英才班、吴仲华工程热物理英才班、新能源英才班、精密光机电与环境科技英才班' },
+        { name: '理科试验班类', type: '大类', subject: '物理类', quota: 17, score: 675, includes: '合肥市，含量子信息科学（未来技术学院）、数学类、数学类（华罗庚数学科技英才班）、物理学类、物理学类（严济慈物理科技英才班）、化学类（卢嘉锡化学科技英才班）、生物科学类（贝时璋生命科技英才班）、空间科学与技术（赵九章现代地球和空间科技英才班）、金融学、大数据管理与应用、统计学专业；教育部首批未来技术学院' },
         // === 物理类 提前批B段（国家专项）===
         { name: '工科试验班（国家专项计划）', type: '大类', subject: '物理类', quota: 1, score: 672, includes: '提前批B段，航空航天、人形机器人、低碳能源技术及安全' },
         { name: '材料类（国家专项计划）', type: '大类', subject: '物理类', quota: 1, score: 669, includes: '提前批B段' },
@@ -1296,23 +1296,23 @@ const universities = [
       province: '河北',
       categories: [
         // === 历史类 本科批 ===
-        { name: '经济管理试验班', type: '大类', subject: '历史类', quota: 20, score: 637, includes: '含工商管理、会计学、建筑学、城乡规划等专业，本专业类内任选专业' },
+        { name: '经济管理试验班', type: '大类', subject: '历史类', quota: 20, score: 637, includes: '含工商管理、会计学、建筑学、城乡规划专业；另包含社会学+信息管理与信息系统专业双学士学位培养、社会学+大数据管理与应用专业双学士学位培养、法学、国际组织与全球治理专业。本专业类内任选专业' },
         // === 物理类 本科批 ===
-        { name: '工科试验班（尖班、港大优学班）', type: '大类', subject: '物理类', quota: 6, score: 681, includes: '含自动化、人工智能、机器人工程、飞行器制造工程等专业，院士领衔' },
-        { name: '工科试验班（AI院士特色班）', type: '大类', subject: '物理类', quota: 4, score: 678, includes: '含人工智能专业，院士担任班主任，第1年校本部，后3年深圳校区' },
-        { name: '工科试验班（自主智能系统院士特色班）', type: '大类', subject: '物理类', quota: 4, score: 676, includes: '含自动化、人工智能、机器人工程等专业，培养地点哈尔滨+上海' },
-        { name: '工科试验班（院士特色班）', type: '大类', subject: '物理类', quota: 4, score: 675, includes: '含永坦班、善义班、小卫星班、智能机器人班，院士担任班主任，领域内专业任选' },
-        { name: '工科试验班（AI加先进技术领军班）', type: '大类', subject: '物理类', quota: 5, score: 674, includes: '含计算机科学与技术、人工智能、信息安全、软件工程等专业，本专业类内任选' },
-        { name: '工科试验班（未来技术拔尖班）', type: '大类', subject: '物理类', quota: 10, score: 674, includes: '校本部理工专业任选，未来技术学院培养，书院制管理' },
-        { name: '工科试验班（AI加先进技术领军班深圳拔尖班）', type: '大类', subject: '物理类', quota: 6, score: 673, includes: '含自动化、集成电路设计与集成系统、通信工程等专业，深圳校区' },
+        { name: '工科试验班（尖班、港大优学班）', type: '大类', subject: '物理类', quota: 6, score: 681, includes: '含自动化、人工智能、复合材料与工程、工程力学、材料科学与工程、机械设计制造及其自动化、机器人工程、飞行器制造工程、环境工程、精密仪器、测控技术与仪器、智能材料与结构、智能装备与系统、土木工程专业；尖班为院士相关研究领域专业任选，港大优学班含人工智能、自动化等专业，院士领衔，学校与香港大学高层次人才担任联合班主任' },
+        { name: '工科试验班（AI院士特色班）', type: '大类', subject: '物理类', quota: 4, score: 678, includes: '含人工智能专业；院士担任班主任，培养地点第1年校本部，后3年深圳校区' },
+        { name: '工科试验班（自主智能系统院士特色班）', type: '大类', subject: '物理类', quota: 4, score: 676, includes: '含自动化、人工智能、探测制导与控制技术、智能装备与系统、机器人工程专业；院士担任班主任，培养地点：哈尔滨+上海（夏季学期）' },
+        { name: '工科试验班（院士特色班）', type: '大类', subject: '物理类', quota: 4, score: 675, includes: '含通信工程、电子信息工程、信息对抗技术、智能科学与技术、自动化、智能装备与系统、飞行器设计与工程、复合材料与工程、工程力学、智能材料与结构、材料科学与工程、焊接技术与工程、飞行器制造工程、机器人工程、机械设计制造及其自动化、智能制造工程、仿生科学与工程专业；含永坦班、善义班、小卫星班、智能机器人班，院士担任班主任，相关领域内专业任选' },
+        { name: '工科试验班（AI加先进技术领军班）', type: '大类', subject: '物理类', quota: 5, score: 674, includes: '含自动化、智能装备与系统、探测制导与控制技术、集成电路设计与集成系统、微电子科学与工程、智能视觉工程、通信工程、电子信息工程、信息对抗技术、智能科学与技术、电气工程及其自动化、能源互联网工程、统计学、计算机科学与技术、人工智能、信息安全、软件工程专业；本专业类内任选专业' },
+        { name: '工科试验班（未来技术拔尖班）', type: '大类', subject: '物理类', quota: 10, score: 674, includes: '含自动化、人工智能、计算机科学与技术、通信工程、电子信息工程、飞行器设计与工程、机器人工程、焊接技术与工程、电气工程及其自动化、复合材料与工程、智能材料与结构、集成电路设计与集成系统、微电子科学与工程、智能视觉工程、探测制导与控制技术、智能装备与系统、信息对抗技术、智能科学与技术、机械设计制造及其自动化、飞行器制造工程、智能制造工程、仿生科学与工程、光电信息材料与器件、飞行器动力工程、精密仪器、智能感知工程、测控技术与仪器、软件工程专业；校本部理工专业任选，未来技术学院培养、书院制管理，采用"一生一策"拔尖培养' },
+        { name: '工科试验班（AI加先进技术领军班深圳拔尖班）', type: '大类', subject: '物理类', quota: 6, score: 673, includes: '含自动化、集成电路设计与集成系统、通信工程、电气工程及其自动化、计算机科学与技术专业；本专业类内任选专业，培养地点为深圳校区' },
         // === 物理类 提前批B段（国家专项）===
         { name: '工科试验班（国家专项计划）', type: '大类', subject: '物理类', quota: 8, score: 652, includes: '提前批B段，卓越优才计划' },
         // === 物理类 中外合作办学 ===
-        { name: '数学与应用数学（中外合作办学）', type: '专业', subject: '物理类', quota: 7, score: 637, includes: '与俄罗斯圣彼得堡国立大学合作，"4+0"培养' },
-        { name: '应用物理学（中外合作办学）', type: '专业', subject: '物理类', quota: 8, score: 637, includes: '与俄罗斯圣彼得堡国立大学合作，"4+0"培养' },
-        { name: '大数据管理与应用（中外合作办学）', type: '专业', subject: '物理类', quota: 5, score: 636, includes: '与法国里昂商学院合作，"4+0"培养' },
-        { name: '化学（中外合作办学）', type: '专业', subject: '物理类', quota: 8, score: 625, includes: '与俄罗斯圣彼得堡国立大学合作，"4+0"培养' },
-        { name: '智慧建筑与建造（中外合作办学）', type: '专业', subject: '物理类', quota: 5, score: 622, includes: '与意大利都灵理工大学合作，"4+0"培养' }
+        { name: '数学与应用数学（中外合作办学）', type: '专业', subject: '物理类', quota: 7, score: 637, includes: '与俄罗斯圣彼得堡国立大学合作。学生入学后不得转专业，"4+0"培养，中英文授课' },
+        { name: '应用物理学（中外合作办学）', type: '专业', subject: '物理类', quota: 8, score: 637, includes: '与俄罗斯圣彼得堡国立大学合作。学生入学后不得转专业，"4+0"培养，中英文授课' },
+        { name: '大数据管理与应用（中外合作办学）', type: '专业', subject: '物理类', quota: 5, score: 636, includes: '与法国里昂商学院合作。学生入学后不得转专业，"4+0"培养，中英文授课' },
+        { name: '化学（中外合作办学）', type: '专业', subject: '物理类', quota: 8, score: 625, includes: '与俄罗斯圣彼得堡国立大学合作。学生入学后不得转专业，"4+0"培养，中英文授课' },
+        { name: '智慧建筑与建造（中外合作办学）', type: '专业', subject: '物理类', quota: 5, score: 622, includes: '与意大利都灵理工大学合作。学生入学后不得转专业，"4+0"培养，中英文授课' }
       ]
     }
   },
@@ -1476,45 +1476,45 @@ const universities = [
       province: '河北',
       categories: [
         // === 历史类 本科批 ===
-        { name: '法学', type: '专业', subject: '历史类', quota: 2, score: 659, includes: '含德语法学、法语法学试验班、国际法' },
-        { name: '文科试验班类（弘毅学堂）', type: '大类', subject: '历史类', quota: 4, score: 658, includes: '含汉语言文学、历史学、哲学、经济学、国际法等专业，可全校任选专业' },
-        { name: '经济学类', type: '大类', subject: '历史类', quota: 2, score: 657, includes: '含经济学、国际经济与贸易、金融学、保险学、财政学专业' },
+        { name: '法学', type: '专业', subject: '历史类', quota: 2, score: 659, includes: '含法学（含德语法学、法语法学试验班）、国际法（含国际法试验班）' },
+        { name: '文科试验班类（弘毅学堂）', type: '大类', subject: '历史类', quota: 4, score: 658, includes: '含汉语言文学、历史学、哲学、心理学、国际经济与贸易、金融学、经济学、国际法专业；含人文科学试验班（可全校任选专业，医学长学制除外）、数智人文试验班、国际组织与全球治理试验班，以及理科试验班（弘毅学堂）对应的各试验班' },
+        { name: '经济学类', type: '大类', subject: '历史类', quota: 2, score: 657, includes: '含经济学、国际经济与贸易、金融学、保险学、财政学专业；含经济学（基地班、能源经济管理试验班）、精算试验班、金融工程' },
         { name: '中国语言文学类', type: '大类', subject: '历史类', quota: 2, score: 657, includes: '含汉语言文学、汉语国际教育专业' },
         { name: '新闻传播学类', type: '大类', subject: '历史类', quota: 2, score: 655, includes: '国际传播、智能传播试验班，含广播电视学、传播学专业' },
-        { name: '工商管理类', type: '大类', subject: '历史类', quota: 2, score: 655, includes: '含工商管理、市场营销、会计学、财务管理等专业' },
-        { name: '外国语言文学类', type: '大类', subject: '历史类', quota: 2, score: 652, includes: '含英语、法语、德语、日语、西班牙语、俄语、翻译专业' },
-        { name: '哲学类', type: '大类', subject: '历史类', quota: 3, score: 652, includes: '含哲学、宗教学专业' },
+        { name: '工商管理类', type: '大类', subject: '历史类', quota: 2, score: 655, includes: '含工商管理、市场营销、会计学、财务管理、人力资源管理、物流管理专业；含工商管理国际试验班（战略与投资方向）、市场营销（数智特色创新试验班）、物流管理（供应链运营方向试验班）、工程管理、管理科学（商业大数据分析方向试验班）' },
+        { name: '外国语言文学类', type: '大类', subject: '历史类', quota: 2, score: 652, includes: '含英语、法语、德语、日语、西班牙语、俄语、翻译专业；含涉外法律人才试验班、国际传播人才试验班、多语种精英人才试验班、网络空间安全人才试验班、遥感空间信息人才试验班' },
+        { name: '哲学类', type: '大类', subject: '历史类', quota: 3, score: 652, includes: '含哲学、宗教学专业；含现代哲学国际班、哲学博睿班' },
         // === 历史类 提前批B段（国家专项）===
         { name: '历史学类（国家专项计划）', type: '大类', subject: '历史类', quota: 2, score: 652, includes: '提前批B段' },
         // === 历史类 艺术类 ===
-        { name: '戏剧影视文学', type: '专业', subject: '历史类', quota: 2, score: 630, includes: '按高考文化课成绩录取，授予艺术学学士学位' },
+        { name: '戏剧影视文学', type: '专业', subject: '历史类', quota: 2, score: 630, includes: '按高考文化课成绩录取的艺术类专业，考生高考文化成绩（含优惠）须达到特殊类型招生录取控制分数线，授予艺术学学士学位' },
         // === 物理类 本科批 ===
         { name: '人工智能（自强班）', type: '专业', subject: '物理类', quota: 2, score: 672, includes: '自强班' },
         { name: '人工智能', type: '专业', subject: '物理类', quota: 4, score: 669, includes: '' },
-        { name: '理科试验班（弘毅学堂）', type: '大类', subject: '物理类', quota: 4, score: 668, includes: '含数学与应用数学、物理学、化学、生物科学、智能制造工程等专业' },
+        { name: '理科试验班（弘毅学堂）', type: '大类', subject: '物理类', quota: 4, score: 668, includes: '含数学与应用数学、物理学、化学、生物科学、智能制造工程、电气工程及其自动化、遥感科学与技术、数字经济专业；含未来科技试验班（可全校任选专业，医学长学制除外）、数智经济试验班、健康科技试验班、智能制造与集成电路试验班、碳中和经济管理创新班，以及文科试验班（弘毅学堂）对应的各试验班' },
         { name: '临床医学（8年）', type: '专业', subject: '物理类', quota: 2, score: 667, includes: '8年制' },
         { name: '网络空间安全（创新班）', type: '专业', subject: '物理类', quota: 2, score: 667, includes: '创新班' },
         { name: '计算机类（计算机学院）', type: '大类', subject: '物理类', quota: 4, score: 665, includes: '含计算机科学与技术、软件工程专业' },
-        { name: '理科试验班（弘毅双学位试验班）', type: '大类', subject: '物理类', quota: 2, score: 665, includes: '含数学与应用数学、遥感科学与技术专业，低空经济试验班等' },
+        { name: '理科试验班（弘毅双学位试验班）', type: '大类', subject: '物理类', quota: 2, score: 665, includes: '含数学与应用数学、遥感科学与技术专业；含低空经济试验班（遥感科学与技术+经济学）、数理金融试验班（金融学+数学与应用数学）、数理经济试验班（经济学+数学与应用数学）' },
         { name: '计算机类（国家网络安全学院）', type: '大类', subject: '物理类', quota: 4, score: 664, includes: '含信息安全、网络空间安全专业' },
         { name: '机器人工程（机器人学院）', type: '专业', subject: '物理类', quota: 2, score: 664, includes: '含机器人工程、自动化' },
         { name: '数学类', type: '大类', subject: '物理类', quota: 4, score: 663, includes: '含数学与应用数学、信息与计算科学、统计学、数据科学与大数据技术专业' },
-        { name: '电子信息类（电子信息学院）', type: '大类', subject: '物理类', quota: 10, score: 663, includes: '含电子信息工程、通信工程专业' },
-        { name: '微电子科学与工程（集成电路学院）', type: '专业', subject: '物理类', quota: 3, score: 662, includes: '' },
+        { name: '电子信息类（电子信息学院）', type: '大类', subject: '物理类', quota: 10, score: 663, includes: '含电子信息工程（含电子信息方向、光电子方向、机器人方向）、通信工程专业；电子信息工程（含卓越工程师计划试验班、逐光创新试验班、人工智能试验班）、通信工程（含卓越工程师计划试验班、人工智能试验班）' },
+        { name: '微电子科学与工程（集成电路学院）', type: '专业', subject: '物理类', quota: 3, score: 662, includes: '集成电路学院' },
         { name: '工科试验班（机器人与智能机械试验班）', type: '大类', subject: '物理类', quota: 3, score: 662, includes: '含智能制造工程、机械设计制造及其自动化专业' },
         { name: '工科试验班（电气类）', type: '大类', subject: '物理类', quota: 11, score: 662, includes: '含电气工程及其自动化、储能科学与工程专业' },
         { name: '遥感科学与技术', type: '专业', subject: '物理类', quota: 9, score: 661, includes: '含遥感科学与技术、空间信息与数字技术' },
         { name: '口腔医学（5+3一体化）', type: '专业', subject: '物理类', quota: 2, score: 660, includes: '5+3一体化' },
         { name: '生物科学类', type: '大类', subject: '物理类', quota: 3, score: 660, includes: '含生物科学、生物技术、生态学专业' },
-        { name: '工科试验班（智慧能源与智能制造类）', type: '大类', subject: '物理类', quota: 8, score: 659, includes: '含智能制造工程、机械设计制造及其自动化、能源与动力工程等专业' },
+        { name: '工科试验班（智慧能源与智能制造类）', type: '大类', subject: '物理类', quota: 8, score: 659, includes: '含智能制造工程、机械设计制造及其自动化、能源与动力工程、核工程与核技术、能源化学工程专业' },
         { name: '地球物理学（数智地空弘毅班）', type: '专业', subject: '物理类', quota: 2, score: 658, includes: '数智地空弘毅班' },
         { name: '临床医学（5+3一体化）', type: '专业', subject: '物理类', quota: 7, score: 656, includes: '5+3一体化' },
         { name: '物理学类', type: '大类', subject: '物理类', quota: 6, score: 656, includes: '含物理学、材料物理专业' },
-        { name: '经济学（数智经济与管理创新班）', type: '专业', subject: '物理类', quota: 2, score: 655, includes: '含经济学基地班、金融工程、市场营销' },
+        { name: '经济学（数智经济与管理创新班）', type: '专业', subject: '物理类', quota: 2, score: 655, includes: '含经济学基地班、金融工程、市场营销（数智特色创新试验班）、管理科学（商业大数据分析方向试验班）' },
         { name: '化学类', type: '大类', subject: '物理类', quota: 5, score: 654, includes: '含化学（含化生方向）、应用化学专业' },
-        { name: '大数据管理与应用', type: '专业', subject: '物理类', quota: 4, score: 654, includes: '含大数据管理与应用、信息管理与信息系统、电子商务等' },
+        { name: '大数据管理与应用', type: '专业', subject: '物理类', quota: 4, score: 654, includes: '含大数据管理与应用、信息管理与信息系统、电子商务、图书馆学、档案学、编辑出版学' },
         { name: '智慧城市与空间规划', type: '专业', subject: '物理类', quota: 8, score: 653, includes: '含智慧城市与空间规划、地理信息科学、地理科学（弘毅班）' },
-        { name: '经济学类', type: '大类', subject: '物理类', quota: 3, score: 652, includes: '含经济学、国际经济与贸易、金融学、保险学、财政学专业' },
+        { name: '经济学类', type: '大类', subject: '物理类', quota: 3, score: 652, includes: '含经济学、国际经济与贸易、金融学、保险学、财政学专业；含经济学（基地班、能源经济管理试验班）、精算试验班、金融工程' },
         // === 物理类 提前批B段（国家专项）===
         { name: '时空信息工程（国家专项计划）', type: '专业', subject: '物理类', quota: 2, score: 659, includes: '提前批B段' },
         { name: '工科试验班（国家专项计划，数智建维与软件类）', type: '大类', subject: '物理类', quota: 2, score: 645, includes: '提前批B段' },
@@ -1681,17 +1681,17 @@ const universities = [
         { name: '临床医学（八年制）', type: '专业', subject: '物理类', quota: 2, score: 672, includes: '八年制，不招色盲色弱' },
         { name: '数学类（珠海）', type: '大类', subject: '物理类', quota: 3, score: 653, includes: '珠海校区，含数学与应用数学、信息与计算科学专业' },
         { name: '软件工程', type: '专业', subject: '物理类', quota: 3, score: 652, includes: '' },
-        { name: '电子信息类', type: '大类', subject: '物理类', quota: 17, score: 652, includes: '含电子信息创新基地班，含通信工程、微电子科学与工程等专业' },
+        { name: '电子信息类', type: '大类', subject: '物理类', quota: 17, score: 652, includes: '含电子信息创新基地班，含通信工程、微电子科学与工程、光电信息科学与工程、电子信息科学与技术专业' },
         { name: '人工智能', type: '专业', subject: '物理类', quota: 10, score: 652, includes: '' },
         { name: '航空航天类', type: '大类', subject: '物理类', quota: 6, score: 649, includes: '含航空航天工程、理论与应用力学专业' },
         { name: '金融学（金融学、AI双学士学位项目，珠海）', type: '专业', subject: '物理类', quota: 3, score: 649, includes: '珠海校区，金融学+AI双学士学位' },
-        { name: '物理学类（珠海）', type: '大类', subject: '物理类', quota: 4, score: 648, includes: '珠海校区，含基础物理与天文学术新星培养实验班' },
-        { name: '生物科学类', type: '大类', subject: '物理类', quota: 5, score: 647, includes: '含生物科学、生物技术、生态学专业，不招色盲色弱' },
-        { name: '生物医学工程', type: '专业', subject: '物理类', quota: 2, score: 646, includes: '含振声创新班，不招色盲色弱' },
-        { name: '化学类', type: '大类', subject: '物理类', quota: 3, score: 646, includes: '含化学、高分子材料与工程、应用化学专业，不招色盲色弱' },
+        { name: '物理学类（珠海）', type: '大类', subject: '物理类', quota: 4, score: 648, includes: '珠海校区，含基础物理与天文学术新星培养实验班，含物理学、天文学专业' },
+        { name: '生物科学类', type: '大类', subject: '物理类', quota: 5, score: 647, includes: '含生物科学、生物技术、生态学专业；不招色盲色弱' },
+        { name: '生物医学工程', type: '专业', subject: '物理类', quota: 2, score: 646, includes: '含振声创新班；不招色盲色弱' },
+        { name: '化学类', type: '大类', subject: '物理类', quota: 3, score: 646, includes: '含化学、高分子材料与工程、应用化学专业；不招色盲色弱' },
         { name: '口腔医学', type: '专业', subject: '物理类', quota: 5, score: 645, includes: '不招色盲色弱' },
         { name: '经济学类（珠海）', type: '大类', subject: '物理类', quota: 3, score: 644, includes: '珠海校区，含经济学、金融学专业' },
-        { name: '临床医学（深圳）', type: '专业', subject: '物理类', quota: 19, score: 641, includes: '深圳校区，含眼科创新班，不招色盲色弱' },
+        { name: '临床医学（深圳）', type: '专业', subject: '物理类', quota: 19, score: 641, includes: '深圳校区，含眼科创新班；不招色盲色弱' },
         { name: '工商管理类（广州）', type: '大类', subject: '物理类', quota: 3, score: 641, includes: '广州校区，含工商管理、会计学专业' },
         // === 物理类 提前批B段（国家专项）===
         { name: '遥感科学与技术（国家专项计划）', type: '专业', subject: '物理类', quota: 2, score: 647, includes: '提前批B段' },
