@@ -222,6 +222,7 @@ function renderUniversityDetail() {
               <th class="px-4 py-3 font-semibold text-gray-700">包含专业</th>
               <th class="px-4 py-3 font-semibold text-gray-700 text-right w-20">计划人数</th>
               <th class="px-3 py-3 font-semibold text-gray-700 text-right" style="width:60px">分数</th>
+              <th class="px-3 py-3 font-semibold text-gray-700 text-right" style="width:70px">排名</th>
               <th class="px-4 py-3 font-semibold text-gray-700" style="min-width:150px">备注（可编辑）</th>
             </tr>
           </thead>
@@ -241,7 +242,7 @@ function renderUniversityDetail() {
           : 'bg-blue-50 text-blue-700 border-blue-200';
         html += `
           <tr class="border-t-2 border-gray-300 subject-separator" data-subject="${curSubject}">
-            <td colspan="9" class="px-4 py-2">
+            <td colspan="10" class="px-4 py-2">
               <span class="text-xs font-semibold px-3 py-1 rounded-full ${subjectColor} border">${subjectLabel}</span>
             </td>
           </tr>`;
@@ -271,6 +272,7 @@ function renderUniversityDetail() {
             <span contenteditable="true" data-uni="${uniId}" data-catkey="${catKey.replace(/"/g, '&quot;')}"
                   class="editable-score outline-none focus:bg-yellow-100 rounded px-1 -mx-1 cursor-text" style="display:inline-block;min-width:36px;text-align:right">${displayScore}</span>
           </td>
+          <td class="px-3 py-3 text-right text-gray-600 text-xs">${c.rank ? c.rank.toLocaleString() : '—'}</td>
           <td class="px-4 py-2">
             <div class="admission-note" contenteditable="true" data-uni="${uniId}" data-catkey="${catKey.replace(/"/g, '&quot;')}"
                  style="min-height:32px"
