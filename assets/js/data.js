@@ -1,3 +1,6 @@
+// 数据版本号：修改数据结构后递增此值，浏览器 localStorage 旧数据将自动失效
+const DATA_VERSION = 1;
+
 // ========== 39所985工程大学数据 ==========
 const universities = [
   {

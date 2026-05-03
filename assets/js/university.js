@@ -52,12 +52,18 @@ function getSchoolsKey(uniId) {
 function getCustomSchools(uniId) {
   try {
     const saved = localStorage.getItem(getSchoolsKey(uniId));
-    return saved ? JSON.parse(saved) : null;
+    if (!saved) return null;
+    const data = JSON.parse(saved);
+    if (data.version !== DATA_VERSION) {
+      localStorage.removeItem(getSchoolsKey(uniId));
+      return null;
+    }
+    return data.schools;
   } catch(e) { return null; }
 }
 
 function saveCustomSchools(uniId, schools) {
-  localStorage.setItem(getSchoolsKey(uniId), JSON.stringify(schools));
+  localStorage.setItem(getSchoolsKey(uniId), JSON.stringify({ version: DATA_VERSION, schools }));
 }
 
 // 获取学院数据：自定义数据优先，否则从原始数据中扁平化学科下的专业
