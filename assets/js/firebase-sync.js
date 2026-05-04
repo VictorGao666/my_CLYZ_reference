@@ -5,12 +5,12 @@
 //   Firebase Console → 项目设置 → 添加 Web 应用 → 复制配置对象
 
 var FIREBASE_CONFIG = {
-  apiKey: "AIzaSyD-PLACEHOLDER",
-  authDomain: "YOUR-PROJECT.firebaseapp.com",
-  projectId: "YOUR-PROJECT",
-  storageBucket: "YOUR-PROJECT.appspot.com",
-  messagingSenderId: "000000000000",
-  appId: "1:000000000000:web:xxxxxxxxxxxxxxxxxxxx"
+  apiKey: "AIzaSyDubbiGSODAZbvN2_Q3kBonWfiGf3XHXm0",
+  authDomain: "gkclyz.firebaseapp.com",
+  projectId: "gkclyz",
+  storageBucket: "gkclyz.firebasestorage.app",
+  messagingSenderId: "56041482320",
+  appId: "1:56041482320:web:2615598f46ebb592aac955"
 };
 
 var _firebaseConfigured = FIREBASE_CONFIG.apiKey.indexOf('PLACEHOLDER') === -1;
