@@ -10,19 +10,11 @@ function getUniversity() {
   return universities.find(u => u.id === id);
 }
 
-// ========== 共享数据同步（Firebase Firestore 优先，REST 回退）==========
+// ========== 共享数据同步（GitHub API）==========
 
-// REST 读取：直接从 GitHub 拉取（快，无冷启动）
-// REST 写入：通过 Render 提交到 GitHub
-var REST_READ_BASE = 'https://raw.githubusercontent.com/VictorGao666/my_CLYZ_reference/main/shared_data';
-var REST_WRITE_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? 'http://localhost:5000'
-  : 'https://gaokao-share.onrender.com';
-
-var _syncMode = null;       // 由 _initSync() 确定：'firebase' | 'rest'
-var _firebaseUnsubscribe = null;
-var _restPollInterval = null;
-var _initialSyncDone = false;
+var _syncInitialized = false;
+var _ghUnsubscribe = null;
+var _pushInFlight = false;
 
 function _syncStatusEl() {
   return document.getElementById('sync-status');
@@ -79,106 +71,43 @@ function _applyRemoteData(uniId, data) {
   return hasUpdate;
 }
 
-// ========== 初始化：探测 Firebase 是否可用，确定同步通道 ==========
+// ========== 初始化 ==========
 
 function _initSync(uniId) {
-  if (_initialSyncDone) return;
-  _initialSyncDone = true;
+  if (_syncInitialized) return;
+  _syncInitialized = true;
 
-  loadFirebaseSDK().then(function() {
-    // Firebase SDK 已就绪，尝试首次拉取
-    return firebasePull(uniId).then(function(data) {
-      if (data) _applyRemoteData(uniId, data);
-      return true;
-    });
-  }).then(function(ok) {
-    // Firebase 通道可用，设置实时监听
-    _syncMode = 'firebase';
-    _setSyncStatus('Firestore 实时同步中', true);
-    firebaseListen(uniId, function(data) {
-      _applyRemoteData(uniId, data);
-    }).then(function(unsub) {
-      _firebaseUnsubscribe = unsub;
-    });
-  }).catch(function(err) {
-    // Firebase 不可用 → 回退 REST 轮询
-    console.warn('Firebase 不可用，使用 REST 回退:', err && err.message);
-    _syncMode = 'rest';
-    _switchToRest(uniId);
+  githubListen(uniId, function(data) {
+    _applyRemoteData(uniId, data);
+    _setSyncStatus('GitHub 同步中', true);
+  }).then(function(unsub) {
+    _ghUnsubscribe = unsub;
   });
-}
-
-function _switchToRest(uniId) {
-  stopRestPolling();
-  // 首次拉取：直接从 GitHub raw 读取（快）
-  fetch(REST_READ_BASE + '/uni_' + uniId + '.json')
-    .then(function(r) { return r.status === 200 ? r.json() : null; })
-    .then(function(data) {
-      if (data && Object.keys(data).length > 0) _applyRemoteData(uniId, data);
-    })
-    .catch(function() {});
-  // 定时轮询（每 10s 从 GitHub raw 拉取）
-  _restPollInterval = setInterval(function() {
-    fetch(REST_READ_BASE + '/uni_' + uniId + '.json')
-      .then(function(r) { return r.status === 200 ? r.json() : null; })
-      .then(function(data) {
-        if (data && Object.keys(data).length > 0) _applyRemoteData(uniId, data);
-      })
-      .catch(function() {});
-  }, 10000);
-  _setSyncStatus('GitHub 轮询中（10s）', true);
-}
-
-function stopRestPolling() {
-  if (_restPollInterval) { clearInterval(_restPollInterval); _restPollInterval = null; }
 }
 
 // ========== 统一入口 ==========
 
 function syncPull(uniId) {
-  if (!_syncMode) { _initSync(uniId); return; }
-  if (_syncMode === 'firebase') {
-    loadFirebaseSDK().then(function() {
-      return firebasePull(uniId);
-    }).then(function(data) {
-      if (data) _applyRemoteData(uniId, data);
-    }).catch(function() {});
-    return;
-  }
-  // REST 模式：直接从 GitHub raw 读取
-  fetch(REST_READ_BASE + '/uni_' + uniId + '.json')
-    .then(function(r) { return r.status === 200 ? r.json() : null; })
-    .then(function(data) {
-      if (data && Object.keys(data).length > 0) _applyRemoteData(uniId, data);
-    })
-    .catch(function() {});
+  githubPull(uniId).then(function(data) {
+    if (data) _applyRemoteData(uniId, data);
+  }).catch(function() {});
 }
 
 function syncPush(uniId) {
+  if (_pushInFlight) return;
   var data = _gatherUniData(uniId);
   if (Object.keys(data).length === 0) return;
 
-  if (_syncMode === 'firebase') {
-    firebasePush(uniId, data).then(function() {
-      _setSyncStatus('Firestore 已同步', true);
-    }).catch(function(err) {
-      console.warn('Firebase push 失败，尝试 REST:', err && err.message);
-      _pushViaRest(uniId, data);
-    });
-  } else {
-    _pushViaRest(uniId, data);
-  }
-}
+  _pushInFlight = true;
+  _setSyncStatus('同步中...', false);
 
-function _pushViaRest(uniId, data) {
-  fetch(REST_WRITE_BASE + '/api/uni/' + uniId, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  })
-  .then(function(r) { return r.json(); })
-  .then(function() { _setSyncStatus('REST 已同步', true); })
-  .catch(function() { _setSyncStatus('离线（仅本地存储）', false); });
+  githubPush(uniId, data).then(function() {
+    _pushInFlight = false;
+    _setSyncStatus('已同步到 GitHub', true);
+  }).catch(function() {
+    _pushInFlight = false;
+    _setSyncStatus('同步失败（本地已保存）', false);
+  });
 }
 
 function startSyncLoop(uniId) {
@@ -186,8 +115,7 @@ function startSyncLoop(uniId) {
 }
 
 function stopSyncLoop() {
-  if (_firebaseUnsubscribe) { _firebaseUnsubscribe(); _firebaseUnsubscribe = null; }
-  stopRestPolling();
+  if (_ghUnsubscribe) { _ghUnsubscribe(); _ghUnsubscribe = null; }
 }
 
 function manualRefresh() {
