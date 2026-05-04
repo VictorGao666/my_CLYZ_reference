@@ -1,0 +1,62 @@
+name: Save Shared Data
+
+on:
+  workflow_dispatch:
+    inputs:
+      uni_id:
+        description: 'University ID'
+        required: true
+        type: string
+      data:
+        description: 'JSON data to save'
+        required: true
+        type: string
+
+jobs:
+  save:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Merge and save shared data
+        run: |
+          mkdir -p shared_data
+          FILE="shared_data/uni_${{ inputs.uni_id }}.json"
+
+          # 如果已有文件则合并，否则新建
+          if [ -f "$FILE" ]; then
+            echo "Merging with existing data..."
+            python3 -c "
+import json, sys
+with open('$FILE') as f:
+    existing = json.load(f)
+incoming = json.loads('''${{ inputs.data }}''')
+existing.update(incoming)
+with open('$FILE', 'w') as f:
+    json.dump(existing, f, ensure_ascii=False, indent=2)
+"
+          else
+            echo "Creating new file..."
+            echo '${{ inputs.data }}' | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+with open('$FILE', 'w') as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+"
+          fi
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add shared_data/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update shared data for uni_${{ inputs.uni_id }}"
+            git push
+          fi

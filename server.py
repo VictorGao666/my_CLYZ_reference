@@ -1,14 +1,12 @@
 """
 高考信息平台 — 共享数据后端
-使用 GitHub 仓库作为持久化存储（数据通过 GitHub Pages 分发）
 纯 Python 标准库实现，零外部依赖
 启动方式: python3 server.py
 
 环境变量：
-  GITHUB_TOKEN  - GitHub Personal Access Token（需要 repo contents 读写权限）
-  GITHUB_REPO   - 仓库路径（默认 VictorGao666/my_CLYZ_reference）
-  GITHUB_BRANCH - 分支名（默认 main）
-  PORT          - 服务端口（默认 5000）
+  PORT              - 服务端口（默认 5000）
+  FIREBASE_API_KEY  - Firebase Web API Key
+  FIREBASE_PROJECT_ID - Firebase 项目 ID
 """
 
 import json
@@ -17,106 +15,169 @@ import re
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
-from base64 import b64encode, b64decode
+from urllib.parse import urlencode
 
 PORT = int(os.environ.get("PORT", 5000))
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
-GITHUB_REPO = os.environ.get("GITHUB_REPO", "VictorGao666/my_CLYZ_reference")
-GITHUB_BRANCH = os.environ.get("GITHUB_BRANCH", "main")
+FIREBASE_API_KEY = os.environ.get("FIREBASE_API_KEY", "")
+FIREBASE_PROJECT_ID = os.environ.get("FIREBASE_PROJECT_ID", "gkclyz")
 
-GH_API = f"https://api.github.com/repos/{GITHUB_REPO}/contents"
-GH_RAW = f"https://raw.githubusercontent.com/{GITHUB_REPO}/{GITHUB_BRANCH}"
-
-DATA_DIR = "shared_data"
-
-# 内存缓存：避免短时间内重复请求 GitHub API
-_cache = {}
-_cache_time = {}
+FIRESTORE = (
+    f"https://firestore.googleapis.com/v1/projects/{FIREBASE_PROJECT_ID}"
+    f"/databases/(default)/documents/shared_data"
+)
 
 
-def _gh_headers():
-    return {
-        "Authorization": f"Bearer {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github+json",
-        "User-Agent": "gaokao-share/1.0",
-        "X-GitHub-Api-Version": "2022-11-28",
-    }
+def _firestore_fields_to_json(fields):
+    """将 Firestore REST API 字段格式转为普通 JSON"""
+    if not fields:
+        return {}
+    result = {}
+    for key, value in fields.items():
+        if "mapValue" in value:
+            inner = value["mapValue"].get("fields", {})
+            result[key] = {}
+            for ik, iv in inner.items():
+                if "integerValue" in iv:
+                    result[key][ik] = int(iv["integerValue"])
+                else:
+                    result[key][ik] = iv.get("stringValue", "")
+        elif "arrayValue" in value:
+            result[key] = []
+            for item in value["arrayValue"].get("values", []):
+                if "mapValue" in item:
+                    obj = {}
+                    for ik, iv in item["mapValue"].get("fields", {}).items():
+                        obj[ik] = iv.get("stringValue", "")
+                    result[key].append(obj)
+                else:
+                    result[key].append(item.get("stringValue", ""))
+        elif "integerValue" in value:
+            result[key] = int(value["integerValue"])
+        else:
+            result[key] = value.get("stringValue", "")
+    return result
 
 
-def _gh_get(path):
-    """从 GitHub API 读取文件内容"""
-    url = f"{GH_API}/{DATA_DIR}/{path}"
-    req = Request(url, headers=_gh_headers())
+def _json_to_firestore_fields(data):
+    """将普通 JSON 转为 Firestore 字段格式"""
+    fields = {}
+    for key, value in data.items():
+        if isinstance(value, dict):
+            map_fields = {}
+            for k, v in value.items():
+                if isinstance(v, int):
+                    map_fields[k] = {"integerValue": str(v)}
+                else:
+                    map_fields[k] = {"stringValue": str(v)}
+            fields[key] = {"mapValue": {"fields": map_fields}}
+        elif isinstance(value, list):
+            values = []
+            for item in value:
+                if isinstance(item, dict):
+                    item_fields = {}
+                    for ik, iv in item.items():
+                        item_fields[ik] = {"stringValue": str(iv)}
+                    values.append({"mapValue": {"fields": item_fields}})
+                else:
+                    values.append({"stringValue": str(item)})
+            fields[key] = {"arrayValue": {"values": values}}
+        elif isinstance(value, int):
+            fields[key] = {"integerValue": str(value)}
+        else:
+            fields[key] = {"stringValue": str(value) if value is not None else ""}
+    return fields
+
+
+def _firestore_get(doc_id):
+    """从 Firestore 读取文档"""
+    url = f"{FIRESTORE}/{doc_id}?key={FIREBASE_API_KEY}"
+    req = Request(url, headers={"Content-Type": "application/json"})
     try:
         with urlopen(req, timeout=15) as resp:
             data = json.loads(resp.read())
-            content = b64decode(data["content"]).decode("utf-8")
-            result = json.loads(content)
-            _cache[path] = result
-            return result, data.get("sha")
-    except HTTPError as e:
-        if e.code == 404:
-            return {}, None
-        body = e.read().decode()[:200]
-        print(f"GitHub GET error ({e.code}): {body}")
-        return None, None
-    except URLError as e:
-        print(f"GitHub network error: {e}")
-        return None, None
-
-
-def _gh_put(path, data, sha=None):
-    """通过 GitHub API 创建或更新文件（即提交到仓库）"""
-    url = f"{GH_API}/{DATA_DIR}/{path}"
-    content = json.dumps(data, ensure_ascii=False, indent=2)
-    body = {
-        "message": f"更新 {path} 的共享数据",
-        "content": b64encode(content.encode("utf-8")).decode("ascii"),
-        "branch": GITHUB_BRANCH,
-    }
-    if sha:
-        body["sha"] = sha
-
-    req = Request(url, data=json.dumps(body).encode("utf-8"), headers=_gh_headers(), method="PUT")
-    try:
-        with urlopen(req, timeout=15) as resp:
-            result = json.loads(resp.read())
-            new_sha = result.get("content", {}).get("sha")
-            # 更新缓存
-            _cache[path] = data
-            return True, new_sha
-    except HTTPError as e:
-        body_text = e.read().decode()[:300]
-        print(f"GitHub PUT error ({e.code}): {body_text}")
-        return False, None
-    except URLError as e:
-        print(f"GitHub network error: {e}")
-        return False, None
-
-
-def _gh_list():
-    """列出 shared_data 目录下的所有文件"""
-    url = f"{GH_API}/{DATA_DIR}"
-    req = Request(url, headers=_gh_headers())
-    try:
-        with urlopen(req, timeout=15) as resp:
-            files = json.loads(resp.read())
-            result = {}
-            for f in files:
-                name = f["name"]
-                if name.endswith(".json"):
-                    uid = name.replace("uni_", "").replace(".json", "")
-                    data, _ = _gh_get(name)
-                    if data:
-                        result[uid] = data
-            return result
+            return _firestore_fields_to_json(data.get("fields", {}))
     except HTTPError as e:
         if e.code == 404:
             return {}
-        print(f"GitHub list error ({e.code})")
-        return {}
+        print(f"Firestore GET error ({e.code}): {e.read().decode()[:200]}")
+        return None
     except URLError as e:
-        print(f"GitHub network error: {e}")
+        print(f"Firestore connection error: {e}")
+        return None
+
+
+def _firestore_set(doc_id, data):
+    """通过 commit API 写入 Firestore 文档"""
+    if not FIREBASE_API_KEY:
+        print("FIREBASE_API_KEY not set")
+        return False
+
+    commit_url = (
+        f"https://firestore.googleapis.com/v1/projects/{FIREBASE_PROJECT_ID}"
+        f"/databases/(default)/documents:commit?key={FIREBASE_API_KEY}"
+    )
+    doc_path = f"projects/{FIREBASE_PROJECT_ID}/databases/(default)/documents/shared_data/{doc_id}"
+    fields = _json_to_firestore_fields(data)
+    field_paths = list(fields.keys())
+
+    body = json.dumps({
+        "writes": [{
+            "update": {"name": doc_path, "fields": fields},
+            "updateMask": {"fieldPaths": field_paths}
+        }]
+    }).encode("utf-8")
+
+    req = Request(commit_url, data=body, headers={"Content-Type": "application/json"}, method="POST")
+    try:
+        with urlopen(req, timeout=15) as resp:
+            resp.read()
+            return True
+    except HTTPError as e:
+        body_text = e.read().decode()[:300]
+        print(f"Firestore write error ({e.code}): {body_text}")
+
+        # 如果文档不存在，尝试用 exists:false 创建
+        if e.code == 400 or e.code == 404:
+            body2 = json.dumps({
+                "writes": [{
+                    "update": {"name": doc_path, "fields": fields},
+                    "updateMask": {"fieldPaths": field_paths},
+                    "currentDocument": {"exists": False}
+                }]
+            }).encode("utf-8")
+            req2 = Request(commit_url, data=body2,
+                           headers={"Content-Type": "application/json"}, method="POST")
+            try:
+                with urlopen(req2, timeout=15) as resp2:
+                    resp2.read()
+                    return True
+            except Exception as e2:
+                print(f"Firestore retry error: {e2}")
+        return False
+    except URLError as e:
+        print(f"Firestore connection error: {e}")
+        return False
+
+
+def _firestore_list():
+    """列出所有共享数据文档"""
+    if not FIREBASE_API_KEY:
+        return {}
+    url = f"{FIRESTORE}?key={FIREBASE_API_KEY}"
+    req = Request(url, headers={"Content-Type": "application/json"})
+    try:
+        with urlopen(req, timeout=15) as resp:
+            result = json.loads(resp.read())
+            docs = {}
+            for doc in result.get("documents", []):
+                name = doc.get("name", "")
+                doc_id = name.split("/")[-1] if name else ""
+                if doc_id:
+                    uid = doc_id.replace("uni_", "")
+                    docs[uid] = _firestore_fields_to_json(doc.get("fields", {}))
+            return docs
+    except Exception as e:
+        print(f"Firestore list error: {e}")
         return {}
 
 
@@ -151,24 +212,15 @@ class Handler(BaseHTTPRequestHandler):
         m = re.match(r"^/api/uni/(\d+)$", self.path)
         if m:
             uni_id = int(m.group(1))
-            path = f"uni_{uni_id}.json"
-
-            if GITHUB_TOKEN:
-                data, _ = _gh_get(path)
-                if data is not None:
-                    self._json(data)
-                else:
-                    self._json({"error": "failed to fetch"}, 502)
+            result = _firestore_get(f"uni_{uni_id}")
+            if result is not None:
+                self._json(result)
             else:
-                self._json({"error": "GITHUB_TOKEN not configured"}, 503)
+                self._json({"error": "failed to fetch"}, 502)
             return
 
         if self.path == "/api/all":
-            if GITHUB_TOKEN:
-                result = _gh_list()
-                self._json(result)
-            else:
-                self._json({"error": "GITHUB_TOKEN not configured"}, 503)
+            self._json(_firestore_list())
             return
 
         self._json({"error": "not found"}, 404)
@@ -182,37 +234,20 @@ class Handler(BaseHTTPRequestHandler):
                 self._json({"error": "body must be a JSON object"}, 400)
                 return
 
-            if not GITHUB_TOKEN:
-                self._json({"error": "GITHUB_TOKEN not configured"}, 503)
-                return
+            doc_id = f"uni_{uni_id}"
+            existing = _firestore_get(doc_id) or {}
+            existing.update(data)
 
-            path = f"uni_{uni_id}.json"
-            # 先读取现有数据以获取 sha，然后合并
-            existing, sha = _gh_get(path)
-            if existing is None:
-                self._json({"error": "failed to read existing data"}, 502)
-                return
-
-            if existing:
-                existing.update(data)
-            else:
-                existing = data
-
-            ok, new_sha = _gh_put(path, existing, sha)
-            if ok:
+            if _firestore_set(doc_id, existing):
                 self._json({"ok": True})
             else:
-                self._json({"error": "failed to commit"}, 502)
+                self._json({"error": "failed to write"}, 502)
             return
 
         self._json({"error": "not found"}, 404)
 
 
 if __name__ == "__main__":
-    if GITHUB_TOKEN:
-        print(f"GitHub 持久化已启用 (repo: {GITHUB_REPO})")
-    else:
-        print("GITHUB_TOKEN 未设置 — 服务无法读写数据")
-        print("请在 Render 环境变量中设置 GITHUB_TOKEN")
+    print(f"Firebase 项目: {FIREBASE_PROJECT_ID}")
     print(f"共享数据服务启动: http://0.0.0.0:{PORT}")
     HTTPServer(("0.0.0.0", PORT), Handler).serve_forever()
