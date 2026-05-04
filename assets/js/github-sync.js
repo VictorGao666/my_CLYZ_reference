@@ -5,7 +5,7 @@
 var GH_RAW = 'https://raw.githubusercontent.com/VictorGao666/my_CLYZ_reference/main/shared_data';
 var GH_WRITE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://localhost:5000'
-  : 'https://gaokao-share.onrender.com';
+  : 'https://victorgao666.pythonanywhere.com';
 
 // 从 GitHub 拉取某个高校的共享数据
 function githubPull(uniId) {
