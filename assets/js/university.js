@@ -12,7 +12,10 @@ function getUniversity() {
 
 // ========== 共享数据同步（Firebase Firestore 优先，REST 回退）==========
 
-var SYNC_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+// REST 读取：直接从 GitHub 拉取（快，无冷启动）
+// REST 写入：通过 Render 提交到 GitHub
+var REST_READ_BASE = 'https://raw.githubusercontent.com/VictorGao666/my_CLYZ_reference/main/shared_data';
+var REST_WRITE_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://localhost:5000'
   : 'https://gaokao-share.onrender.com';
 
@@ -107,23 +110,23 @@ function _initSync(uniId) {
 
 function _switchToRest(uniId) {
   stopRestPolling();
-  // 首次拉取
-  fetch(SYNC_BASE + '/api/uni/' + uniId)
-    .then(function(r) { return r.json(); })
+  // 首次拉取：直接从 GitHub raw 读取（快）
+  fetch(REST_READ_BASE + '/uni_' + uniId + '.json')
+    .then(function(r) { return r.status === 200 ? r.json() : null; })
     .then(function(data) {
       if (data && Object.keys(data).length > 0) _applyRemoteData(uniId, data);
     })
     .catch(function() {});
-  // 定时轮询
+  // 定时轮询（每 10s 从 GitHub raw 拉取）
   _restPollInterval = setInterval(function() {
-    fetch(SYNC_BASE + '/api/uni/' + uniId)
-      .then(function(r) { return r.json(); })
+    fetch(REST_READ_BASE + '/uni_' + uniId + '.json')
+      .then(function(r) { return r.status === 200 ? r.json() : null; })
       .then(function(data) {
         if (data && Object.keys(data).length > 0) _applyRemoteData(uniId, data);
       })
       .catch(function() {});
   }, 10000);
-  _setSyncStatus('REST 轮询中（10s）', true);
+  _setSyncStatus('GitHub 轮询中（10s）', true);
 }
 
 function stopRestPolling() {
@@ -142,9 +145,9 @@ function syncPull(uniId) {
     }).catch(function() {});
     return;
   }
-  // REST 模式
-  fetch(SYNC_BASE + '/api/uni/' + uniId)
-    .then(function(r) { return r.json(); })
+  // REST 模式：直接从 GitHub raw 读取
+  fetch(REST_READ_BASE + '/uni_' + uniId + '.json')
+    .then(function(r) { return r.status === 200 ? r.json() : null; })
     .then(function(data) {
       if (data && Object.keys(data).length > 0) _applyRemoteData(uniId, data);
     })
@@ -168,7 +171,7 @@ function syncPush(uniId) {
 }
 
 function _pushViaRest(uniId, data) {
-  fetch(SYNC_BASE + '/api/uni/' + uniId, {
+  fetch(REST_WRITE_BASE + '/api/uni/' + uniId, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
