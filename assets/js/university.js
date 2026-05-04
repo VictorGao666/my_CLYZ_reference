@@ -10,11 +10,16 @@ function getUniversity() {
   return universities.find(u => u.id === id);
 }
 
-// ========== 共享数据同步（与 server.py 后端通信）==========
+// ========== 共享数据同步（Firebase Firestore 优先，REST 回退）==========
 
 var SYNC_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://localhost:5000'
   : 'https://gaokao-share.onrender.com';
+
+var _syncMode = null;       // 由 _initSync() 确定：'firebase' | 'rest'
+var _firebaseUnsubscribe = null;
+var _restPollInterval = null;
+var _initialSyncDone = false;
 
 function _syncStatusEl() {
   return document.getElementById('sync-status');
@@ -25,85 +30,161 @@ function _setSyncStatus(text, ok) {
   if (!el) return;
   el.textContent = text;
   el.className = ok ? 'text-xs text-green-400' : 'text-xs text-blue-200';
-  // 显示/隐藏手动刷新按钮
   var btn = document.getElementById('sync-refresh-btn');
-  if (btn) {
-    btn.classList.toggle('hidden', ok);
+  if (btn) btn.classList.toggle('hidden', ok);
+}
+
+// 将远程数据写入 localStorage，有更新则重渲染
+function _applyRemoteData(uniId, data) {
+  if (!data || Object.keys(data).length === 0) return false;
+  var hasUpdate = false;
+  if (data.scores) {
+    Object.keys(data.scores).forEach(function(k) {
+      var key = 'uni_score_' + uniId + '_' + k;
+      var oldVal = localStorage.getItem(key);
+      var newVal = String(data.scores[k]);
+      if (oldVal !== newVal) { hasUpdate = true; }
+      localStorage.setItem(key, newVal);
+    });
+  }
+  if (data.schools) {
+    var oldSchools = localStorage.getItem('uni_schools_' + uniId);
+    var newSchools = JSON.stringify({ version: DATA_VERSION, schools: data.schools });
+    if (oldSchools !== newSchools) { hasUpdate = true; }
+    localStorage.setItem('uni_schools_' + uniId, newSchools);
+  }
+  if (data.order) {
+    var oldOrder = localStorage.getItem('uni_order_' + uniId);
+    var newOrder = JSON.stringify(data.order);
+    if (oldOrder !== newOrder) { hasUpdate = true; }
+    localStorage.setItem('uni_order_' + uniId, newOrder);
+  }
+  if (data.notes !== undefined) {
+    var oldNotes = localStorage.getItem('uni_notes_' + uniId);
+    if (oldNotes !== data.notes) { hasUpdate = true; }
+    localStorage.setItem('uni_notes_' + uniId, data.notes);
+  }
+  if (data.admissionNotes) {
+    Object.keys(data.admissionNotes).forEach(function(k) {
+      var key = 'uni_adm_note_' + uniId + '_' + k;
+      var oldVal = localStorage.getItem(key);
+      if (oldVal !== data.admissionNotes[k]) { hasUpdate = true; }
+      localStorage.setItem(key, data.admissionNotes[k]);
+    });
+  }
+  if (hasUpdate) renderUniversityDetail();
+  return hasUpdate;
+}
+
+// ========== 初始化：探测 Firebase 是否可用，确定同步通道 ==========
+
+function _initSync(uniId) {
+  if (_initialSyncDone) return;
+  _initialSyncDone = true;
+
+  loadFirebaseSDK().then(function() {
+    // Firebase SDK 已就绪，尝试首次拉取
+    return firebasePull(uniId).then(function(data) {
+      if (data) _applyRemoteData(uniId, data);
+      return true;
+    });
+  }).then(function(ok) {
+    // Firebase 通道可用，设置实时监听
+    _syncMode = 'firebase';
+    _setSyncStatus('Firestore 实时同步中', true);
+    firebaseListen(uniId, function(data) {
+      _applyRemoteData(uniId, data);
+    }).then(function(unsub) {
+      _firebaseUnsubscribe = unsub;
+    });
+  }).catch(function(err) {
+    // Firebase 不可用 → 回退 REST 轮询
+    console.warn('Firebase 不可用，使用 REST 回退:', err && err.message);
+    _syncMode = 'rest';
+    _switchToRest(uniId);
+  });
+}
+
+function _switchToRest(uniId) {
+  stopRestPolling();
+  // 首次拉取
+  fetch(SYNC_BASE + '/api/uni/' + uniId)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && Object.keys(data).length > 0) _applyRemoteData(uniId, data);
+    })
+    .catch(function() {});
+  // 定时轮询
+  _restPollInterval = setInterval(function() {
+    fetch(SYNC_BASE + '/api/uni/' + uniId)
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data && Object.keys(data).length > 0) _applyRemoteData(uniId, data);
+      })
+      .catch(function() {});
+  }, 10000);
+  _setSyncStatus('REST 轮询中（10s）', true);
+}
+
+function stopRestPolling() {
+  if (_restPollInterval) { clearInterval(_restPollInterval); _restPollInterval = null; }
+}
+
+// ========== 统一入口 ==========
+
+function syncPull(uniId) {
+  if (!_syncMode) { _initSync(uniId); return; }
+  if (_syncMode === 'firebase') {
+    loadFirebaseSDK().then(function() {
+      return firebasePull(uniId);
+    }).then(function(data) {
+      if (data) _applyRemoteData(uniId, data);
+    }).catch(function() {});
+    return;
+  }
+  // REST 模式
+  fetch(SYNC_BASE + '/api/uni/' + uniId)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && Object.keys(data).length > 0) _applyRemoteData(uniId, data);
+    })
+    .catch(function() {});
+}
+
+function syncPush(uniId) {
+  var data = _gatherUniData(uniId);
+  if (Object.keys(data).length === 0) return;
+
+  if (_syncMode === 'firebase') {
+    firebasePush(uniId, data).then(function() {
+      _setSyncStatus('Firestore 已同步', true);
+    }).catch(function(err) {
+      console.warn('Firebase push 失败，尝试 REST:', err && err.message);
+      _pushViaRest(uniId, data);
+    });
+  } else {
+    _pushViaRest(uniId, data);
   }
 }
 
-var _syncInterval = null;
-
-function syncPull(uniId) {
-  return fetch(SYNC_BASE + '/api/uni/' + uniId)
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (!data || Object.keys(data).length === 0) {
-        _setSyncStatus('服务器暂无共享数据', false);
-        return false;
-      }
-      var hasUpdate = false;
-      // scores
-      if (data.scores) {
-        Object.keys(data.scores).forEach(function(k) {
-          var key = 'uni_score_' + uniId + '_' + k;
-          var oldVal = localStorage.getItem(key);
-          var newVal = String(data.scores[k]);
-          if (oldVal !== newVal) { hasUpdate = true; }
-          localStorage.setItem(key, newVal);
-        });
-      }
-      // schools
-      if (data.schools) {
-        var oldSchools = localStorage.getItem('uni_schools_' + uniId);
-        var newSchools = JSON.stringify({ version: DATA_VERSION, schools: data.schools });
-        if (oldSchools !== newSchools) { hasUpdate = true; }
-        localStorage.setItem('uni_schools_' + uniId, newSchools);
-      }
-      // order
-      if (data.order) {
-        var oldOrder = localStorage.getItem('uni_order_' + uniId);
-        var newOrder = JSON.stringify(data.order);
-        if (oldOrder !== newOrder) { hasUpdate = true; }
-        localStorage.setItem('uni_order_' + uniId, newOrder);
-      }
-      // notes
-      if (data.notes !== undefined) {
-        var oldNotes = localStorage.getItem('uni_notes_' + uniId);
-        if (oldNotes !== data.notes) { hasUpdate = true; }
-        localStorage.setItem('uni_notes_' + uniId, data.notes);
-      }
-      // admissionNotes
-      if (data.admissionNotes) {
-        Object.keys(data.admissionNotes).forEach(function(k) {
-          var key = 'uni_adm_note_' + uniId + '_' + k;
-          var oldVal = localStorage.getItem(key);
-          if (oldVal !== data.admissionNotes[k]) { hasUpdate = true; }
-          localStorage.setItem(key, data.admissionNotes[k]);
-        });
-      }
-      if (hasUpdate) {
-        _setSyncStatus('已加载共享数据（有更新）', true);
-        renderUniversityDetail();
-      } else {
-        _setSyncStatus('已加载共享数据', true);
-      }
-      return hasUpdate;
-    })
-    .catch(function() {
-      _setSyncStatus('离线模式（仅本地存储）', false);
-    });
+function _pushViaRest(uniId, data) {
+  fetch(SYNC_BASE + '/api/uni/' + uniId, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(function(r) { return r.json(); })
+  .then(function() { _setSyncStatus('REST 已同步', true); })
+  .catch(function() { _setSyncStatus('离线（仅本地存储）', false); });
 }
 
 function startSyncLoop(uniId) {
-  stopSyncLoop();
-  _syncInterval = setInterval(function() {
-    syncPull(uniId);
-  }, 10000);
+  _initSync(uniId);
 }
 
 function stopSyncLoop() {
-  if (_syncInterval) { clearInterval(_syncInterval); _syncInterval = null; }
+  if (_firebaseUnsubscribe) { _firebaseUnsubscribe(); _firebaseUnsubscribe = null; }
+  stopRestPolling();
 }
 
 function manualRefresh() {
@@ -111,6 +192,8 @@ function manualRefresh() {
   _setSyncStatus('刷新中...', false);
   syncPull(uniId);
 }
+
+// ========== 本地数据收集（与同步模式无关）==========
 
 function _gatherUniData(uniId) {
   var data = {};
@@ -159,19 +242,6 @@ function _gatherUniData(uniId) {
   if (Object.keys(admissionNotes).length > 0) data.admissionNotes = admissionNotes;
 
   return data;
-}
-
-function syncPush(uniId) {
-  var data = _gatherUniData(uniId);
-  if (Object.keys(data).length === 0) return;
-  fetch(SYNC_BASE + '/api/uni/' + uniId, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  })
-  .then(function(r) { return r.json(); })
-  .then(function() { _setSyncStatus('已同步', true); })
-  .catch(function() { _setSyncStatus('离线模式（仅本地存储）', false); });
 }
 
 function assessmentBadge(grade) {
@@ -811,7 +881,6 @@ document.addEventListener('DOMContentLoaded', function() {
   renderUniversityDetail();
   var uniId = getUniversityId();
   if (uniId) {
-    syncPull(uniId);
-    startSyncLoop(uniId);
+    startSyncLoop(uniId);  // _initSync 内部完成首次拉取 + 持续同步
   }
 });

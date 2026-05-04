@@ -1,0 +1,10 @@
+// Firestore 安全规则 — 在 Firebase Console > Firestore > Rules 中部署
+// 此规则允许所有用户读写 shared_data 集合（公开共享数据）
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /shared_data/{document} {
+      allow read, write: if true;
+    }
+  }
+}
