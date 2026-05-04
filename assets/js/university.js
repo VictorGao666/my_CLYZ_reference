@@ -10,6 +10,170 @@ function getUniversity() {
   return universities.find(u => u.id === id);
 }
 
+// ========== 共享数据同步（与 server.py 后端通信）==========
+
+var SYNC_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:5000'
+  : 'https://gaokao-share.onrender.com';
+
+function _syncStatusEl() {
+  return document.getElementById('sync-status');
+}
+
+function _setSyncStatus(text, ok) {
+  var el = _syncStatusEl();
+  if (!el) return;
+  el.textContent = text;
+  el.className = ok ? 'text-xs text-green-400' : 'text-xs text-blue-200';
+  // 显示/隐藏手动刷新按钮
+  var btn = document.getElementById('sync-refresh-btn');
+  if (btn) {
+    btn.classList.toggle('hidden', ok);
+  }
+}
+
+var _syncInterval = null;
+
+function syncPull(uniId) {
+  return fetch(SYNC_BASE + '/api/uni/' + uniId)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data || Object.keys(data).length === 0) {
+        _setSyncStatus('服务器暂无共享数据', false);
+        return false;
+      }
+      var hasUpdate = false;
+      // scores
+      if (data.scores) {
+        Object.keys(data.scores).forEach(function(k) {
+          var key = 'uni_score_' + uniId + '_' + k;
+          var oldVal = localStorage.getItem(key);
+          var newVal = String(data.scores[k]);
+          if (oldVal !== newVal) { hasUpdate = true; }
+          localStorage.setItem(key, newVal);
+        });
+      }
+      // schools
+      if (data.schools) {
+        var oldSchools = localStorage.getItem('uni_schools_' + uniId);
+        var newSchools = JSON.stringify({ version: DATA_VERSION, schools: data.schools });
+        if (oldSchools !== newSchools) { hasUpdate = true; }
+        localStorage.setItem('uni_schools_' + uniId, newSchools);
+      }
+      // order
+      if (data.order) {
+        var oldOrder = localStorage.getItem('uni_order_' + uniId);
+        var newOrder = JSON.stringify(data.order);
+        if (oldOrder !== newOrder) { hasUpdate = true; }
+        localStorage.setItem('uni_order_' + uniId, newOrder);
+      }
+      // notes
+      if (data.notes !== undefined) {
+        var oldNotes = localStorage.getItem('uni_notes_' + uniId);
+        if (oldNotes !== data.notes) { hasUpdate = true; }
+        localStorage.setItem('uni_notes_' + uniId, data.notes);
+      }
+      // admissionNotes
+      if (data.admissionNotes) {
+        Object.keys(data.admissionNotes).forEach(function(k) {
+          var key = 'uni_adm_note_' + uniId + '_' + k;
+          var oldVal = localStorage.getItem(key);
+          if (oldVal !== data.admissionNotes[k]) { hasUpdate = true; }
+          localStorage.setItem(key, data.admissionNotes[k]);
+        });
+      }
+      if (hasUpdate) {
+        _setSyncStatus('已加载共享数据（有更新）', true);
+        renderUniversityDetail();
+      } else {
+        _setSyncStatus('已加载共享数据', true);
+      }
+      return hasUpdate;
+    })
+    .catch(function() {
+      _setSyncStatus('离线模式（仅本地存储）', false);
+    });
+}
+
+function startSyncLoop(uniId) {
+  stopSyncLoop();
+  _syncInterval = setInterval(function() {
+    syncPull(uniId);
+  }, 10000);
+}
+
+function stopSyncLoop() {
+  if (_syncInterval) { clearInterval(_syncInterval); _syncInterval = null; }
+}
+
+function manualRefresh() {
+  var uniId = getUniversityId();
+  _setSyncStatus('刷新中...', false);
+  syncPull(uniId);
+}
+
+function _gatherUniData(uniId) {
+  var data = {};
+
+  // scores
+  var scores = {};
+  for (var i = 0; i < localStorage.length; i++) {
+    var key = localStorage.key(i);
+    var prefix = 'uni_score_' + uniId + '_';
+    if (key && key.indexOf(prefix) === 0) {
+      var catKey = key.substring(prefix.length);
+      scores[catKey] = parseInt(localStorage.getItem(key), 10);
+    }
+  }
+  if (Object.keys(scores).length > 0) data.scores = scores;
+
+  // schools
+  var schoolsRaw = localStorage.getItem('uni_schools_' + uniId);
+  if (schoolsRaw) {
+    try {
+      var parsed = JSON.parse(schoolsRaw);
+      data.schools = parsed.schools || parsed;
+    } catch(e) {}
+  }
+
+  // order
+  var orderRaw = localStorage.getItem('uni_order_' + uniId);
+  if (orderRaw) {
+    try { data.order = JSON.parse(orderRaw); } catch(e) {}
+  }
+
+  // notes
+  var notesRaw = localStorage.getItem('uni_notes_' + uniId);
+  if (notesRaw !== null && notesRaw !== undefined) data.notes = notesRaw;
+
+  // admissionNotes
+  var admissionNotes = {};
+  for (var j = 0; j < localStorage.length; j++) {
+    var k = localStorage.key(j);
+    var pfx = 'uni_adm_note_' + uniId + '_';
+    if (k && k.indexOf(pfx) === 0) {
+      var ck = k.substring(pfx.length);
+      admissionNotes[ck] = localStorage.getItem(k);
+    }
+  }
+  if (Object.keys(admissionNotes).length > 0) data.admissionNotes = admissionNotes;
+
+  return data;
+}
+
+function syncPush(uniId) {
+  var data = _gatherUniData(uniId);
+  if (Object.keys(data).length === 0) return;
+  fetch(SYNC_BASE + '/api/uni/' + uniId, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(function(r) { return r.json(); })
+  .then(function() { _setSyncStatus('已同步', true); })
+  .catch(function() { _setSyncStatus('离线模式（仅本地存储）', false); });
+}
+
 function assessmentBadge(grade) {
   if (!grade) return '<span class="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-400">待公布</span>';
   const colors = {
@@ -64,6 +228,7 @@ function getCustomSchools(uniId) {
 
 function saveCustomSchools(uniId, schools) {
   localStorage.setItem(getSchoolsKey(uniId), JSON.stringify({ version: DATA_VERSION, schools }));
+  syncPush(uniId);
 }
 
 // 获取学院数据：自定义数据优先，否则从原始数据中扁平化学科下的专业
@@ -460,6 +625,7 @@ function saveCurrentOrder() {
     if (catKey) keys.push(catKey);
   });
   localStorage.setItem(getOrderKey(), JSON.stringify(keys));
+  syncPush(getUniversityId());
 }
 
 function moveRow(btn, direction) {
@@ -539,6 +705,7 @@ function initNotes() {
       clearTimeout(saveTimer);
       saveTimer = setTimeout(() => {
         localStorage.setItem(getNotesKey(), editor.innerHTML);
+        syncPush(uniId);
         if (status) {
           status.textContent = '已自动保存 ' + new Date().toLocaleTimeString();
           setTimeout(() => { status.textContent = ''; }, 2000);
@@ -557,6 +724,7 @@ function initNotes() {
       clearTimeout(saveTimer);
       saveTimer = setTimeout(() => {
         localStorage.setItem(key, note.innerHTML);
+        syncPush(uniId);
       }, 500);
     });
   });
@@ -572,6 +740,7 @@ function initNotes() {
           const catKey = span.getAttribute('data-catkey');
           const scoreKey = getCustomScoreKey(uniId, catKey);
           localStorage.setItem(scoreKey, num);
+          syncPush(uniId);
           updateScoreColor(span.parentElement, num);
         }
       }, 500);
@@ -637,7 +806,12 @@ function clearNotes() {
 
 // ========== 初始化 ==========
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
   highlightNav();
   renderUniversityDetail();
+  var uniId = getUniversityId();
+  if (uniId) {
+    syncPull(uniId);
+    startSyncLoop(uniId);
+  }
 });
