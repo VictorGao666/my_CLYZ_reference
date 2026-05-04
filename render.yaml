@@ -8,7 +8,5 @@ services:
     envVars:
       - key: PORT
         value: "5000"
-      - key: FIREBASE_PROJECT_ID
-        value: "gkclyz"
-      - key: FIREBASE_API_KEY
+      - key: GITHUB_TOKEN
         sync: false
